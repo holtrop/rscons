@@ -265,27 +265,51 @@ which they were added.
 Example:
 
 ```ruby
-task "build" do
-  env do |env|
-    env.Program("^^/proj.elf", glob("src/**/*.c"))
-  end
+proj_env = env do |env|
+  env.Program("^/proj.elf", glob("src/**/*.c"))
 end
 
-task "flash", deps: "build" do
-  sh "nrfjprog", "-f", "NRF52", "--program", env.expand("^^/proj.elf")
+task "flash" do
+  sh "nrfjprog", "-f", "NRF52", "--program", proj_env.expand("^/proj.elf")
 end
 ```
 
-In this example, the `flash` task depends on the `build` task.
-So if the project had not yet been built, and the user executes
-`./rscons flash`, the project would first be built and then flashed to the
-target.
+In this example, the `flash` task would first build the proj.elf target and
+then flash it to target with the nrfjprog program.
 
 If the `task` method is called again with the name of an already existing task,
 the task is not overwritten, but rather modified.
 Any newly specified dependencies are added to the current dependencies.
 Any action block is appended to the task's list of action blocks to execute
 when the task is executed.
+
+For example, with the `Rsconscript`:
+
+```ruby
+task "a" do
+  puts "A"
+end
+
+task "b" do
+  puts "B"
+end
+
+task "c", depends: "a" do
+  puts "C1"
+end
+
+task "c", depends: "b" do
+  puts "C2"
+end
+```
+
+The following behavior is observed:
+
+    $ ./rscons c
+    A
+    B
+    C1
+    C2
 
 Note that for a simple project, the build script may not need to define any
 tasks at all and could just make use of the Rscons built-in default task (see
@@ -378,7 +402,7 @@ argument (task name) automatically filled in by the shortcut method.
 For example:
 
 ```ruby
-default deps: "unpack_compiler" do
+default depends: "unpack_compiler" do
   puts "default task"
 end
 ```
@@ -386,7 +410,7 @@ end
 is equivalent to:
 
 ```ruby
-task "default", deps: "unpack_compiler" do
+task "default", depends: "unpack_compiler" do
   puts "default task"
 end
 ```
@@ -463,11 +487,11 @@ task "build" do
   ...
 end
 
-task "flash" do
+task "flash", depends: "build" do
   ...
 end
 
-default deps: "build"
+default depends: "build"
 ```
 
 Then when the user runs `./rscons` the "build" task will be executed.
