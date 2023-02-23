@@ -925,11 +925,11 @@ There are several default builders that are built-in to Rscons:
 
   * `Command`, which executes a user-defined command to produce the target.
   * `Copy`, which copies files or directories to a specified destination.
-  * `CFile`, which builds a C or C++ source file from a lex or yacc input file.
   * `Directory`, which creates a directory.
   * `Disassemble`, which disassembles an object file to a disassembly listing.
   * `Install`, which installs files or directories to a specified destination.
   * `InstallDirectory`, which creates a directory in an install destination.
+  * `Lex`, which builds a source file from a lex input file.
   * `Library`, which collects object files into a static library archive file.
   * `Object`, which compiles source files to produce an object file.
   * `Preprocess`, which invokes the C/C++ preprocessor on a source file.
@@ -939,6 +939,7 @@ There are several default builders that are built-in to Rscons:
   * `SharedObject`, which compiles source files to produce an object file, in a
     way that is able to be used to create a shared library.
   * `Size`, which runs the 'size' utility on an executable file.
+  * `Yacc`, which builds a source file from a yacc input file.
 
 ####> The Command Builder
 
@@ -964,17 +965,6 @@ The `Command` builder supports the following construction variables:
   * `CMD_STDOUT` (optional) specifies a file to redirect standard output to.
     `CMD_STDOUT` is expanded for variable references, so the token `${_TARGET}`
     can be used, for example.
-
-####> The CFile Builder
-
-```ruby
-env.CFile(target, source)
-# Example
-env.CFile("^/parser/parser.c", "parser.y")
-```
-
-The `CFile` builder will generate a C or C++ source file from a lex (.l, .ll)
-or yacc (.y, .yy) input file.
 
 ####> The Copy Builder
 
@@ -1047,6 +1037,17 @@ The `clean` task removes targets created by the `Directory` builder but not by
 the `InstallDirectory` builder.
 The `uninstall` task removes targets created by the `InstallDirectory` builder
 but not by the `Directory` builder.
+
+####> The Lex Builder
+
+```ruby
+env.Lex(target, source)
+# Example
+env.Lex("^/lexer.c", "lexer.l")
+```
+
+The `Lex` builder will generate a source file from a lex (.l, .ll)
+input file.
 
 ####> The Library Builder
 
@@ -1177,6 +1178,17 @@ The `Size` builder runs the "size" executable on the given source file and
 stores its output in the target file.
 The size executable can be specified with the `SIZE` construction variable,
 and flags can be specified with `SIZEFLAGS`.
+
+####> The Yacc Builder
+
+```ruby
+env.Yacc(target, source)
+# Example
+env.Yacc("^/parser.c", "parser.y")
+```
+
+The `Yacc` builder will generate a source file from a yacc (.y, .yy)
+input file.
 
 ###> Phony Targets
 
@@ -1959,7 +1971,7 @@ end
 
 ```ruby
 env do |env|
-  env.CFile("^/parser.tab.cc", "parser.yy")
+  env.Yacc("^/parser.tab.cc", "parser.yy")
 end
 ```
 

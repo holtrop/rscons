@@ -23,13 +23,13 @@ module Rscons
   # Names of the default builders which will be added to all newly created
   # {Environment} objects.
   DEFAULT_BUILDERS = [
-    :CFile,
     :Command,
     :Copy,
     :Directory,
     :Disassemble,
     :Install,
     :InstallDirectory,
+    :Lex,
     :Library,
     :Object,
     :Preprocess,
@@ -37,6 +37,7 @@ module Rscons
     :SharedLibrary,
     :SharedObject,
     :Size,
+    :Yacc,
   ]
 
   # Class to represent a fatal error during an Rscons operation.
@@ -135,11 +136,11 @@ require_relative "rscons/builders/mixins/object_deps"
 require_relative "rscons/builders/mixins/program"
 
 # default builders
-require_relative "rscons/builders/cfile"
 require_relative "rscons/builders/command"
 require_relative "rscons/builders/copy"
 require_relative "rscons/builders/directory"
 require_relative "rscons/builders/disassemble"
+require_relative "rscons/builders/lex"
 require_relative "rscons/builders/library"
 require_relative "rscons/builders/object"
 require_relative "rscons/builders/preprocess"
@@ -148,6 +149,7 @@ require_relative "rscons/builders/shared_library"
 require_relative "rscons/builders/shared_object"
 require_relative "rscons/builders/simple_builder"
 require_relative "rscons/builders/size"
+require_relative "rscons/builders/yacc"
 
 # language support
 require_relative "rscons/builders/lang/asm"

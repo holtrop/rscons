@@ -1163,27 +1163,20 @@ EOF
     end
   end
 
-  context "CFile builder" do
-    it "builds a .c file using flex and bison" do
-      test_dir("cfile")
+  context "Lex and Yacc builders" do
+    it "builds C files using flex and bison" do
+      test_dir("lex_yacc")
 
       result = run_rscons
       expect(result.stderr).to eq ""
       verify_lines(lines(result.stdout), [
-        %r{Generating lexer from lexer.l => lexer.c},
-        %r{Generating parser from parser.y => parser.c},
+        %r{Generating lexer source from lexer.l => lexer.c},
+        %r{Generating parser source from parser.y => parser.c},
       ])
 
       result = run_rscons
       expect(result.stderr).to eq ""
       expect(result.stdout).to eq ""
-    end
-
-    it "raises an error when an unknown source file is specified" do
-      test_dir("cfile")
-      result = run_rscons(args: %w[-f error_unknown_extension.rb])
-      expect(result.stderr).to match /Unknown source file .foo.bar. for CFile builder/
-      expect(result.status).to_not eq 0
     end
   end
 

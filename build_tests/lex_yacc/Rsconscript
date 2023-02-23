@@ -1,0 +1,4 @@
+env do |env|
+  env.Lex("lexer.c", "lexer.l")
+  env.Yacc("parser.c", "parser.y")
+end

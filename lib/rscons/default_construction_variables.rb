@@ -49,7 +49,6 @@ module Rscons
     "LDCMD" => %w[${LD} -o ${_TARGET} ${LDFLAGS} ${_SOURCES} ${LIBDIRPREFIX}${LIBPATH} ${LIBLINKPREFIX}${LIBS}],
     "LDFLAGS" => [],
     "LEX" => "flex",
-    "LEXSUFFIX" => %w[.l .ll],
     "LEX_CMD" => %w[${LEX} ${LEX_FLAGS} -o ${_TARGET} ${_SOURCES}],
     "LEX_FLAGS" => [],
     "LIBDIRPREFIX" => "-L",
@@ -84,7 +83,6 @@ module Rscons
     "SIZECMD" => %w[${SIZE} ${SIZEFLAGS} ${_SOURCES}],
     "SIZEFLAGS" => [],
     "YACC" => "bison",
-    "YACCSUFFIX" => %w[.y .yy],
     "YACC_CMD" => %w[${YACC} ${YACC_FLAGS} -o ${_TARGET} ${_SOURCES}],
     "YACC_FLAGS" => %w[-d],
   }
