@@ -2369,6 +2369,13 @@ EOF
           expect(result.stdout).to_not match /gcc.*-o.*myconfigtest1.*-DMYPACKAGE/
           expect(result.stdout).to match /gcc.*-o.*myconfigtest2.*-DMYPACKAGE/
         end
+
+        it "indicates that pkg-config command cannot be found" do
+          test_dir "configure"
+          result = run_rscons(args: %w[-f check_cfg_no_pkg_config.rb configure])
+          expect(result.stderr).to match /Error: executable 'pkg-config' not found/
+          expect(result.status).to_not eq 0
+        end
       end
 
       context "when passed a program" do

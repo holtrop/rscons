@@ -125,7 +125,12 @@ module Rscons
       elsif program = options[:program]
         Ansi.write($stdout, "Checking '", :cyan, program, :reset, "'... ")
       end
-      program ||= "pkg-config"
+      unless program
+        program = "pkg-config"
+        unless Util.find_executable(program)
+          raise RsconsError.new("Error: executable '#{program}' not found")
+        end
+      end
       args = options[:args] || %w[--cflags --libs]
       command = [program, *args, package].compact
       stdout, _, status = log_and_test_command(command)
