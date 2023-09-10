@@ -277,7 +277,15 @@ module Rscons
       if extra_path = builder_class.extra_path
         extra_path = "/#{extra_path}"
       end
-      "#{@build_root}/o#{extra_path}/#{Util.make_relative_path("#{source_fname}#{suffix}")}".gsub("\\", "/")
+      source_fname = source_fname.gsub("\\", "/")
+      if extra_path.nil? && source_fname.start_with?("#{@build_root}/")
+        # If the source file is in the environment's build directory and no
+        # builder "extra path" is present, then just place the output file
+        # next to the source file.
+        "#{source_fname}#{suffix}"
+      else
+        "#{@build_root}/o#{extra_path}/#{Util.make_relative_path("#{source_fname}#{suffix}")}"
+      end
     end
 
     # Build all build targets specified in the Environment.

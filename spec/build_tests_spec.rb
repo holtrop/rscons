@@ -990,6 +990,14 @@ EOF
     verify_lines(slines, [%r{\babs.exe\b}])
   end
 
+  it "creates object files next to the source file for source files in the build root" do
+    test_dir "simple"
+    result = run_rscons(args: %w[-f build_root_source_path.rb])
+    expect(result.stderr).to eq ""
+    expect(File.exist?("build/e/o/build/e/src/foo.c.o")).to be_falsey
+    expect(File.exist?("build/e/src/foo.c.o")).to be_truthy
+  end
+
   it "creates shared libraries" do
     test_dir("shared_library")
 
