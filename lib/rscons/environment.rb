@@ -277,7 +277,7 @@ module Rscons
       if extra_path = builder_class.extra_path
         extra_path = "/#{extra_path}"
       end
-      "#{@build_root}#{extra_path}/#{Util.make_relative_path("#{source_fname}#{suffix}")}".gsub("\\", "/")
+      "#{@build_root}/o#{extra_path}/#{Util.make_relative_path("#{source_fname}#{suffix}")}".gsub("\\", "/")
     end
 
     # Build all build targets specified in the Environment.
