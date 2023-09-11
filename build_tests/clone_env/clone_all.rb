@@ -1,4 +1,4 @@
-env1 = env(echo: :command) do |env|
+env1 = env("e1", echo: :command) do |env|
   env['CFLAGS'] = '-O2'
   env.add_build_hook do |builder|
     builder.vars['CPPFLAGS'] = '-DSTRING="Hello"'
@@ -9,6 +9,6 @@ env1 = env(echo: :command) do |env|
   env.Program('program.exe', Dir['src/*.c'])
 end
 
-env2 = env1.clone do |env|
+env2 = env1.clone("e2") do |env|
   env.Program('program2.exe', Dir['src/*.c'])
 end

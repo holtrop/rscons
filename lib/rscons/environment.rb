@@ -74,15 +74,19 @@ module Rscons
     # Create an Environment object.
     def initialize(*args, &block)
       @id = self.class.get_id
-      if args.first.is_a?(String)
-        base_name = args.slice!(0)
-      else
-        base_name = "e.#{@id}"
-      end
       variant_keys = (Rscons.application.active_variants || []).map do |variant|
         variant[:key]
       end.compact
-      @name = [base_name, *variant_keys].join("-")
+      if args.first.is_a?(String)
+        base_name = args.slice!(0)
+        @name = [base_name, *variant_keys].join("-")
+        @build_root = "#{Rscons.application.build_dir}/#{@name}"
+      else
+        if variant_keys.size > 0
+          raise RsconsError.new("Error: an Environment with active variants must be given a name")
+        end
+        @build_root = Rscons.application.build_dir
+      end
       options = args.first || {}
       unless Cache.instance["configuration_data"]["configured"]
         raise "Project must be configured before creating an Environment"
@@ -114,7 +118,6 @@ module Rscons
         else
           :short
         end
-      @build_root = "#{Rscons.application.build_dir}/#{@name}"
       @n_threads = Rscons.application.n_threads
       @build_steps = 0
       self.class.register(self)

@@ -1,10 +1,10 @@
-debug = env(echo: :command) do |env|
+debug = env("dbg", echo: :command) do |env|
   env['CFLAGS'] = '-O2'
   env['CPPFLAGS'] = '-DSTRING="Debug Version"'
   env.Program('program-debug.exe', Dir['src/*.c'])
 end
 
-release = debug.clone do |env|
+release = debug.clone("rls") do |env|
   env["CPPFLAGS"] = '-DSTRING="Release Version"'
   env.Program('program-release.exe', Dir['src/*.c'])
 end
