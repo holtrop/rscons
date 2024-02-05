@@ -2047,10 +2047,11 @@ EOF
             test_dir "configure"
             create_exe "gdc", "exit 1"
             create_exe "ldc2", "exit 1"
+            create_exe "ldc", "exit 1"
             result = run_rscons(args: %W[-f #{rsconscript} configure])
             expect(result.stderr).to match %r{Configuration failed; log file written to build/_configure/config.log}
             expect(result.status).to_not eq 0
-            expect(result.stdout).to match /Checking for D compiler\.\.\. not found \(checked gdc, ldc2\)/
+            expect(result.stdout).to match /Checking for D compiler\.\.\. not found \(checked gdc, ldc2, ldc\)/
           end
         end
       end
@@ -2285,6 +2286,18 @@ EOF
         expect(result.status).to eq 0
         expect(result.stdout).to match /Checking for library 'm'... found/
         expect(result.stdout).to_not match /-lm/
+      end
+
+      it "finds the requested library with only ldc compiler" do
+        test_dir "configure"
+        create_exe "gcc", "exit 1"
+        create_exe "clang", "exit 1"
+        create_exe "gcc++", "exit 1"
+        create_exe "clang++", "exit 1"
+        result = run_rscons(args: %w[-f check_lib_with_ldc.rb])
+        expect(result.stderr).to eq ""
+        expect(result.status).to eq 0
+        expect(result.stdout).to match /Checking for library 'z'... found/
       end
 
       it "modifies LIBPATH based on check_libpath" do

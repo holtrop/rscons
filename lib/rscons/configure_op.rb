@@ -1,5 +1,6 @@
 require "fileutils"
 require "open3"
+require "set"
 
 module Rscons
   # Class to manage a configure operation.
@@ -10,6 +11,7 @@ module Rscons
     # @param script [Script]
     #   Build script.
     def initialize(script)
+      @tested_compilers = {}
       @work_dir = "#{Rscons.application.build_dir}/_configure"
       FileUtils.mkdir_p(@work_dir)
       @log_file_name = "#{@work_dir}/config.log"
@@ -65,6 +67,10 @@ module Rscons
       cc = ccc.find do |cc|
         test_c_compiler(cc, options)
       end
+      if cc
+        @tested_compilers["c"] ||= Set.new
+        @tested_compilers["c"] << cc
+      end
       complete(cc ? 0 : 1, options.merge(
         success_message: cc,
         fail_message: "not found (checked #{ccc.join(", ")})"))
@@ -89,6 +95,10 @@ module Rscons
       cc = ccc.find do |cc|
         test_cxx_compiler(cc, options)
       end
+      if cc
+        @tested_compilers["cxx"] ||= Set.new
+        @tested_compilers["cxx"] << cc
+      end
       complete(cc ? 0 : 1, options.merge(
         success_message: cc,
         fail_message: "not found (checked #{ccc.join(", ")})"))
@@ -108,10 +118,14 @@ module Rscons
       end
       if cdc.empty?
         # Default D compiler search array.
-        cdc = %w[gdc ldc2]
+        cdc = %w[gdc ldc2 ldc]
       end
       dc = cdc.find do |dc|
         test_d_compiler(dc, options)
+      end
+      if dc
+        @tested_compilers["d"] ||= Set.new
+        @tested_compilers["d"] << dc
       end
       complete(dc ? 0 : 1, options.merge(
         success_message: dc,
@@ -252,17 +266,36 @@ module Rscons
     def check_lib(lib, options = {})
       check_libpath = [nil] + (options[:check_libpath] || [])
       Ansi.write($stdout, "Checking for library '", :cyan, lib, :reset, "'... ")
-      File.open("#{@work_dir}/cfgtest.c", "wb") do |fh|
-        fh.puts <<-EOF
-          int main(int argc, char * argv[]) {
-            return 0;
-          }
-        EOF
+      if @tested_compilers["d"]
+        source_file = "#{@work_dir}/cfgtest.d"
+        File.open(source_file, "wb") do |fh|
+          fh.puts <<-EOF
+            int main() {
+              return 0;
+            }
+          EOF
+        end
+      else
+        source_file = "#{@work_dir}/cfgtest.c"
+        File.open(source_file, "wb") do |fh|
+          fh.puts <<-EOF
+            int main(int argc, char * argv[]) {
+              return 0;
+            }
+          EOF
+        end
+      end
+      ld = "${CC}"
+      %w[d cxx c].each do |language|
+        if @tested_compilers[language]
+          ld = @tested_compilers[language].first
+          break
+        end
       end
       vars = {
-        "LD" => "${CC}",
+        "LD" => ld,
         "LIBS" => [lib],
-        "_SOURCES" => "#{@work_dir}/cfgtest.c",
+        "_SOURCES" => source_file,
         "_TARGET" => "#{@work_dir}/cfgtest.exe",
       }
       status = 1
@@ -496,8 +529,10 @@ module Rscons
           env = BasicEnvironment.new
           merge = {
             "DC" => dc,
-            "DCCMD" => env["DCCMD"].map {|e| e.sub(/^-o$/, "-of")},
-            "LDCMD" => env["LDCMD"].map {|e| e.sub(/^-o$/, "-of")},
+            "DC:-o" => "-of",
+            "LD:-o" => "-of",
+            "LIBDIRPREFIX" => "-L-L",
+            "LIBLINKPREFIX" => "-L-l",
             "DDEPGEN" => ["-deps=${_DEPFILE}"],
           }
           merge["OBJSUFFIX"] = [ldc_objsuffix]
