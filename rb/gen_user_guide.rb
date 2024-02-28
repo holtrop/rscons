@@ -99,7 +99,7 @@ class Generator
     end
 
     template = File.read("rb/assets/user_guide.html.erb")
-    erb = ERB.new(template, nil, "<>")
+    erb = ERB.new(template, trim_mode: "<>")
 
     if multi_page
       @pages.each_with_index do |page, page_index|
