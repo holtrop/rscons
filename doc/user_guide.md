@@ -1308,10 +1308,10 @@ It iterates through each enabled variant and calls the given block.
 In this example, the block would be called twice, once with the "kde" variant
 active, and the second time with the "gnome" variant active.
 
-Each `env()` call creates an Environment, so two environments are created.
+Each `env` method call creates an Environment, so two environments are created.
 When an Environment is created within a `with_variants` block, the
-Environment's name has the active variant(s) appended to the given Environment
-name (if any), and separated by a "-".
+Environment's build directory name has the active variant(s) keys appended to
+the given Environment name, and separated by a "-".
 
 In this example, a "prog-kde" Environment would be created with build root
 build/prog-kde and -DKDE would be passed to the compiler when compiling each
@@ -1319,6 +1319,29 @@ source.
 Next a "prog-gnome" Environment would be created with build root
 build/prog-gnome and -DGNOME would be passed to the compiler when compiling
 the sources.
+
+The key for a variant is the variant's name by default but can be overridden by
+passing a `:key` value to the `variant` method.
+A `nil` value for the `:key` parameter will omit that variant from appearing
+in the environment's build directory name.
+For example:
+
+```ruby
+variant "debug"
+variant "release", key: nil
+
+with_variants do
+  env "prog" do |env|
+  end
+end
+```
+
+In this example, one "prog" environment will be created for the "debug" variant
+with the build directory "prog-debug", and another "prog" environment will be
+created for the "release" variant with the build directory "prog".
+The build directory for the release variant of the "prog" environment is just
+"prog" instead of "prog-release" because the key for the "release" variant is
+set to `nil`.
 
 Variants are enabled by default, but can be disabled by passing a `false` value
 to the `:default` option of the `variant` method.

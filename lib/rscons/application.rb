@@ -258,6 +258,14 @@ module Rscons
     #
     # @param name [String]
     #   Variant name.
+    # @param options [Hash]
+    #   Optional parameters.
+    # @option options [String] :default
+    #   Whether the variant is enabled by default (default: true).
+    # @option options [String] :key
+    #   Variant key, used to name an Environment's build directory. If nil,
+    #   this variant will not contribute to the Environment's build directory
+    #   name.
     def variant(name, options = {})
       if @active_variants
         !!@active_variants.find {|variant| variant[:name] == name}
@@ -294,6 +302,15 @@ module Rscons
     end
 
     # Create a variant group.
+    #
+    # @overload variant_group(name, options = {})
+    #   @param name [String]
+    #     Variant group name (optional).
+    #   @param options [Hash]
+    #     Optional variant group parameters.
+    # @overload variant_group(options = {})
+    #   @param options [Hash]
+    #     Optional variant group parameters.
     def variant_group(*args, &block)
       if args.first.is_a?(String)
         name = args.slice!(0)

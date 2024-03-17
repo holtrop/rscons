@@ -289,27 +289,80 @@ module Rscons
       end
 
       # Create or modify a task.
+      #
+      # @overload task(name, options = {}, &block)
+      # @param name [String]
+      #   Task name.
+      # @param options [Hash]
+      #   Optional task attributes.
+      # @option options [Boolean] :autoconf
+      #   Whether to automatically configure before running this task
+      #   (default: true).
+      # @option options [String] :desc
+      #   Description for the task.
+      # @option options [Array<String>] :depends
+      #   Dependencies of the task.
+      # @option options [Array<Task::Param>] :params
+      #   Task parameter definitions.
+      #
+      # The action block given will be invoked by Rscons when the task
+      # executes. It will be passed two arguments:
+      #   1) The Task object.
+      #   2) A Hash of task parameter names and values.
       def task(*args, &block)
         Util.task(*args, &block)
       end
 
       # Define a variant, or within a with_variants block, query if it is
       # active.
-      def variant(*args)
-        Rscons.application.variant(*args)
+      #
+      # @param name [String]
+      #   Variant name.
+      # @param options [Hash]
+      #   Optional parameters.
+      # @option options [String] :default
+      #   Whether the variant is enabled by default (default: true).
+      # @option options [String] :key
+      #   Variant key, used to name an Environment's build directory. If nil,
+      #   this variant will not contribute to the Environment's build directory
+      #   name.
+      def variant(name, options = {})
+        Rscons.application.variant(name, options)
       end
 
       # Check if a variant is enabled.
-      def variant_enabled?(*args)
-        Rscons.application.variant_enabled?(*args)
+      #
+      # This can be used, for example, in a configuration block to omit or
+      # include configuration checks based on which variants have been
+      # configured.
+      #
+      # @param variant_name [String]
+      #   Variant name.
+      #
+      # @return [Boolean]
+      #   Whether the requested variant is enabled.
+      def variant_enabled?(variant_name)
+        Rscons.application.variant_enabled?(variant_name)
       end
 
       # Create a variant group.
+      #
+      # @overload variant_group(name, options = {})
+      #   @param name [String]
+      #     Variant group name (optional).
+      #   @param options [Hash]
+      #     Optional variant group parameters.
+      # @overload variant_group(options = {})
+      #   @param options [Hash]
+      #     Optional variant group parameters.
       def variant_group(*args, &block)
         Rscons.application.variant_group(*args, &block)
       end
 
-      # Iterate through variants.
+      # Iterate through enabled variants.
+      #
+      # The given block is called for each combination of enabled variants
+      # across the defined variant groups.
       def with_variants(&block)
         Rscons.application.enable_variants
         Rscons.application.with_variants(&block)
@@ -349,11 +402,17 @@ module Rscons
     # Top-level DSL available to the Rsconscript.
     class TopLevelDsl < GlobalDsl
       # Set the project name.
+      #
+      # @param project_name [String]
+      #   Project name.
       def project_name(project_name)
         @script.project_name = project_name
       end
 
-      # Whether to automatically configure (default true).
+      # Set whether to automatically configure (default true).
+      #
+      # @param autoconf [Boolean]
+      #   Whether to automatically configure.
       def autoconf(autoconf)
         @script.autoconf = autoconf
       end
