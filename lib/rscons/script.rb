@@ -291,19 +291,19 @@ module Rscons
       # Create or modify a task.
       #
       # @overload task(name, options = {}, &block)
-      # @param name [String]
-      #   Task name.
-      # @param options [Hash]
-      #   Optional task attributes.
-      # @option options [Boolean] :autoconf
-      #   Whether to automatically configure before running this task
-      #   (default: true).
-      # @option options [String] :desc
-      #   Description for the task.
-      # @option options [Array<String>] :depends
-      #   Dependencies of the task.
-      # @option options [Array<Task::Param>] :params
-      #   Task parameter definitions.
+      #   @param name [String]
+      #     Task name.
+      #   @param options [Hash]
+      #     Optional task attributes.
+      #   @option options [Boolean] :autoconf
+      #     Whether to automatically configure before running this task
+      #     (default: true).
+      #   @option options [String] :desc
+      #     Description for the task.
+      #   @option options [Array<String>] :depends
+      #     Dependencies of the task.
+      #   @option options [Array<Task::Param>] :params
+      #     Task parameter definitions.
       #
       # The action block given will be invoked by Rscons when the task
       # executes. It will be passed two arguments:
