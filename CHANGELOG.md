@@ -1,3 +1,19 @@
+## v3.2.0
+
+### New Features
+
+- #171 - Place object files next to source files for source files in build directory
+- #170 - Use top-level build directory as environment build directory for unnamed environments
+- #167 - Add upgrading instructions
+- #166 - Replace CFile builder with Yacc and Lex builders
+
+### Fixes
+
+- #172 - Fix configuration checks performed with ldc2 compiler
+- #169 - Output a better error when pkg-config is not found
+- #168 - Cannot output binary to an environment's build root with the same name as the top-level source directory
+- #164 - Improve DSL method documentation
+
 ## v3.1.0
 
 ### New Features
