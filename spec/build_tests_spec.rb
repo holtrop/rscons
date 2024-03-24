@@ -3408,4 +3408,22 @@ EOF
     end
   end
 
+  it "supports building LLVM assembly files with the Program builder" do
+    test_dir "llvm"
+    result = run_rscons
+    expect(result.stderr).to eq ""
+    expect(result.status).to eq 0
+    expect(File.exist?("llvmtest.exe")).to be_truthy
+    expect(`./llvmtest.exe`).to match /hello world/
+  end
+
+  it "supports building LLVM assembly files with the Program builder in direct mode" do
+    test_dir "llvm"
+    result = run_rscons(args: %w[-f direct.rb])
+    expect(result.stderr).to eq ""
+    expect(result.status).to eq 0
+    expect(File.exist?("llvmtest.exe")).to be_truthy
+    expect(`./llvmtest.exe`).to match /hello again/
+  end
+
 end

@@ -156,6 +156,7 @@ require_relative "rscons/builders/lang/asm"
 require_relative "rscons/builders/lang/c"
 require_relative "rscons/builders/lang/cxx"
 require_relative "rscons/builders/lang/d"
+require_relative "rscons/builders/lang/llvm_asm"
 
 # Unbuffer $stdout
 $stdout.sync = true

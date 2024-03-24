@@ -1,0 +1,4 @@
+env do |env|
+  env["LLVMAS_FLAGS"] += %w[-Wno-override-module]
+  env.Program("llvmtest.exe", %w[main.c one.ll])
+end
