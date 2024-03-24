@@ -9,7 +9,7 @@ It supports the following features:
   * multi-threaded job execution
   * auto-configuration
   * built-in builders for several common operations
-  * out-of-the-box support for C, C++, and D languages
+  * out-of-the-box support for Assembly, C, C++, D, and LLVM
   * extensibility for other languages or custom builders
   * compatible with Windows, Linux, OS X, and FreeBSD
   * colorized output with build progress

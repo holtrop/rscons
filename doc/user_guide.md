@@ -6,7 +6,7 @@ It supports the following features:
   * multi-threaded job execution
   * auto-configuration
   * built-in builders for several common operations
-  * out-of-the-box support for C, C++, and D languages
+  * out-of-the-box support for Assembly, C, C++, D, and LLVM
   * extensibility for other languages or custom builders
   * compatible with Windows, Linux, OS X, and FreeBSD
   * colorized output with build progress
@@ -1617,8 +1617,8 @@ end
 The `Object` and `SharedObject` builders that ship with Rscons have an API that
 allows the user to register extra languages that can be suppored by the
 builders.
-In fact, the built-in support for assembly, C, C++, and D compilation all make
-use of this built-in API.
+In fact, the built-in support for assembly, C, C++, D, and LLVM compilation
+all make use of this built-in API.
 To see an example of how this API is used, see the
 `lib/rscons/builders/lang/*.rb` files in the Rscons source repository.
 For example, here is how the C++ language is registered:
@@ -1924,6 +1924,15 @@ end
 env do |env|
   env["DFLAGS"] << "-Wall"
   env.Program("program", glob("src/**/*.d"))
+end
+```
+
+### Example: Building a Program from C and LLVM Sources
+
+```ruby
+env do |env|
+  env["CFLAGS"] << "-Wall"
+  env.Program("program", glob("src/**/*.{c,ll}"))
 end
 ```
 
