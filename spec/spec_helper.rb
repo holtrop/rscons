@@ -1,4 +1,4 @@
-if ENV["dist_specs"]
+if ENV["rscons_dist_specs"]
   require_relative "../test/rscons"
 else
   require "simplecov"
@@ -11,12 +11,7 @@ else
     else
       command_name "RSpec"
     end
-    if ENV["dist_specs"]
-      add_filter "/bin/"
-      add_filter "/lib/"
-    else
-      add_filter "test/rscons.rb"
-    end
+    add_filter "test/rscons.rb"
     project_name "Rscons"
     merge_timeout 3600
   end

@@ -32,11 +32,12 @@ end
 # useful for coverage information.
 desc "Dist Specs"
 task :dspec, [:example_string] => :build_dist do |task, args|
+  FileUtils.rm_rf("test")
   FileUtils.mkdir_p("test")
   FileUtils.cp("dist/rscons", "test/rscons.rb")
-  ENV["dist_specs"] = "1"
+  ENV["rscons_dist_specs"] = "1"
   Rake::Task["spec"].execute(args)
-  ENV.delete("dist_specs")
+  ENV.delete("rscons_dist_specs")
   FileUtils.rm_f(Dir.glob(".rscons-*"))
 end
 
