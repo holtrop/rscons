@@ -665,7 +665,7 @@ EOF
     expect(result.stdout).to eq ""
   end
 
-  unless RUBY_PLATFORM =~ /mingw|msys/
+  unless RUBY_PLATFORM =~ /mingw|msys|darwin/
     it "supports building D sources with gdc" do
       test_dir("d")
       result = run_rscons
@@ -711,7 +711,7 @@ EOF
     expect(`./hello-d.exe`.rstrip).to eq "Hello from D, value is 33!"
   end
 
-  unless RUBY_PLATFORM =~ /mingw|msys/
+  unless RUBY_PLATFORM =~ /mingw|msys|darwin/
     it "links with the D linker when object files were built from D sources" do
       test_dir("d")
       result = run_rscons(args: %w[-f link_objects.rb])
@@ -761,7 +761,7 @@ EOF
     result = run_rscons(args: %w[-f disassemble.rb])
     expect(result.stderr).to eq ""
     expect(File.exist?("simple.txt")).to be_truthy
-    expect(File.read("simple.txt")).to match /Disassembly of section .text:/
+    expect(File.read("simple.txt")).to match /Disassembly of section/
 
     result = run_rscons(args: %w[-f disassemble.rb])
     expect(result.stderr).to eq ""
@@ -1211,7 +1211,7 @@ EOF
         %r{Compiling simple.c},
         %r{My Disassemble simple.txt},
       ])
-      expect(File.read("simple.txt")).to match /Disassembly of section .text:/
+      expect(File.read("simple.txt")).to match /Disassembly of section/
     end
   end
 
@@ -2024,7 +2024,7 @@ EOF
       {"check_d_compiler.rb" => "when no arguments are given",
        "check_d_compiler_find_first.rb" => "when arguments are given"}.each_pair do |rsconscript, desc|
         context desc do
-          unless RUBY_PLATFORM =~ /mingw|msys/
+          unless RUBY_PLATFORM =~ /mingw|msys|darwin/
             it "finds the first listed D compiler" do
               test_dir "configure"
               result = run_rscons(args: %W[-f #{rsconscript} configure])
@@ -2056,18 +2056,18 @@ EOF
         end
       end
 
-      it "respects use flag" do
-        test_dir "configure"
-        result = run_rscons(args: %w[-f check_d_compiler_use.rb -v])
-        expect(result.stderr).to eq ""
-        expect(result.status).to eq 0
-        expect(result.stdout).to match %r{\bgdc .*/t1/}
-        expect(result.stdout).to_not match %r{\bldc2 .*/t1/}
-        expect(result.stdout).to match %r{\bldc2 .*/t2/}
-        expect(result.stdout).to_not match %r{\bgdc .*/t2/}
-      end
+      unless RUBY_PLATFORM =~ /mingw|msys|darwin/
+        it "respects use flag" do
+          test_dir "configure"
+          result = run_rscons(args: %w[-f check_d_compiler_use.rb -v])
+          expect(result.stderr).to eq ""
+          expect(result.status).to eq 0
+          expect(result.stdout).to match %r{\bgdc .*/t1/}
+          expect(result.stdout).to_not match %r{\bldc2 .*/t1/}
+          expect(result.stdout).to match %r{\bldc2 .*/t2/}
+          expect(result.stdout).to_not match %r{\bgdc .*/t2/}
+        end
 
-      unless RUBY_PLATFORM =~ /mingw|msys/
         it "successfully tests a compiler with an unknown name that uses gdc-compatible options" do
           test_dir "configure"
           create_exe "mycompiler", %[exec gdc "$@"]

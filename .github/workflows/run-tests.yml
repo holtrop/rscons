@@ -1,0 +1,38 @@
+name: Run RScons Tests
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        ruby-version: ['2.7', '3.0', '3.4']
+    
+    steps:
+    - name: Install dependencies (Linux)
+      if: runner.os == 'Linux'
+      run: sudo apt-get update && sudo apt-get install -y gcc gdc ldc clang flex bison
+
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: brew install gcc ldc flex bison
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby-version }}
+
+    - name: Install dependencies
+      run: bundle install
+
+    - name: Run tests
+      run: rake all
