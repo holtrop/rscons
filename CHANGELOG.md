@@ -1,3 +1,12 @@
+## v3.3.0
+
+### New Features
+
+- Add support for Ruby 3.4.
+- Fix up some macOS test cases.
+- #177 - Remove dependency on base64
+- #175 - Add support for building object files from LLVM assembly sources
+
 ## v3.2.0
 
 ### New Features
