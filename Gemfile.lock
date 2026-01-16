@@ -2,17 +2,17 @@ GEM
   remote: https://rubygems.org/
   specs:
     base64 (0.3.0)
-    date (3.5.0)
+    date (3.5.1)
     diff-lcs (1.6.2)
     docile (1.1.5)
-    erb (6.0.0)
-    json (2.16.0)
-    openssl (3.3.1)
-    psych (5.2.6)
+    erb (6.0.1)
+    json (2.18.0)
+    openssl (4.0.0)
+    psych (5.3.1)
       date
       stringio
     rake (13.3.1)
-    rdoc (6.15.1)
+    rdoc (7.1.0)
       erb
       psych (>= 4.0.0)
       tsort
@@ -35,10 +35,10 @@ GEM
       json (>= 1.8, < 3)
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.2)
-    stringio (3.1.8)
+    stringio (3.2.0)
     syntax (1.2.2)
     tsort (0.2.0)
-    yard (0.9.37)
+    yard (0.9.38)
 
 PLATFORMS
   ruby
