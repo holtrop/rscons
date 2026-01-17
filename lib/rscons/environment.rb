@@ -397,7 +397,11 @@ module Rscons
         expand(ud)
       end
       @user_deps[target] ||= []
-      @user_deps[target] = (@user_deps[target] + user_deps).uniq
+      (@user_deps[target] + user_deps).each do |ud|
+        unless Rscons.phony_target?(ud) || @user_deps[target].include?(ud)
+          @user_deps[target] << ud
+        end
+      end
       build_after(target, user_deps)
     end
 
@@ -623,7 +627,9 @@ module Rscons
     #
     # @return [void]
     def run_builder(builder)
-      builder.build_step ||= get_next_build_step
+      unless builder.is_a?(Rscons::Builders::Barrier)
+        builder.build_step ||= get_next_build_step
+      end
       case result = builder.run({})
       when Array
         result.each do |waititem|
@@ -649,8 +655,10 @@ module Rscons
           Cache.instance.register_build(side_effect, nil, [], self, side_effect: true)
           @side_effects.delete(side_effect)
         end
-        @build_hooks[:post].each do |build_hook_block|
-          build_hook_block.call(builder)
+        unless builder.is_a?(Rscons::Builders::Barrier)
+          @build_hooks[:post].each do |build_hook_block|
+            build_hook_block.call(builder)
+          end
         end
         process_remove_wait(builder)
       else
@@ -727,8 +735,10 @@ module Rscons
       if @builder_sets.size > 0
         if builder = @builder_sets[0].get_next_builder_to_run(targets_still_building)
           builder.vars = @varset.merge(builder.vars)
-          @build_hooks[:pre].each do |build_hook_block|
-            build_hook_block.call(builder)
+          unless builder.is_a?(Rscons::Builders::Barrier)
+            @build_hooks[:pre].each do |build_hook_block|
+              build_hook_block.call(builder)
+            end
           end
           return run_builder(builder)
         end

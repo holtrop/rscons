@@ -37,7 +37,7 @@ module Rscons
     #   The number of remaining build steps.
     def build_steps_remaining
       self.reduce(0) do |result, (target, builders)|
-        result + builders.size
+        result + builders.count {|b| !b.is_a?(Rscons::Builders::Barrier)}
       end
     end
 

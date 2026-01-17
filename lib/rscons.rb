@@ -23,6 +23,7 @@ module Rscons
   # Names of the default builders which will be added to all newly created
   # {Environment} objects.
   DEFAULT_BUILDERS = [
+    :Barrier,
     :Command,
     :Copy,
     :Directory,
@@ -64,6 +65,13 @@ module Rscons
     # @return [Boolean] Whether the given target is a phony target.
     def phony_target?(target)
       target.is_a?(Symbol)
+    end
+
+    # Generate a random phony target name.
+    #
+    # @return [Symbol] Phony target name.
+    def gen_phony_target
+      ("t" + sprintf("%08x", rand(1_000_000..4_000_000_000))).to_sym
     end
 
     # Return the system shell and arguments for executing a shell command.
@@ -136,6 +144,7 @@ require_relative "rscons/builders/mixins/object_deps"
 require_relative "rscons/builders/mixins/program"
 
 # default builders
+require_relative "rscons/builders/barrier"
 require_relative "rscons/builders/command"
 require_relative "rscons/builders/copy"
 require_relative "rscons/builders/directory"
