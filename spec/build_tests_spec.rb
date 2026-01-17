@@ -1347,6 +1347,14 @@ EOF
         %r{Checker simple.exe},
       ])
     end
+
+    it "supports phony targets as dependencies" do
+      test_dir "typical"
+      result = run_rscons(args: %w[-f phonies.rb])
+      expect(result.stderr).to eq ""
+      expect(result.status).to eq 0
+      expect(result.stdout).to match /t1.*phony2.*t2.*phony1.*t3/m
+    end
   end
 
   context "Environment#clear_targets" do
