@@ -9,7 +9,7 @@ require "rspec/core/rake_task"
 require "rake/clean"
 require "fileutils"
 
-CLEAN.include %w[build_test_run .yardoc yard coverage test]
+CLEAN.include %w[build_test_run .yardoc yard coverage test_run]
 CLOBBER.include %w[dist gen large_project pkg]
 
 task :build_dist do
@@ -19,7 +19,6 @@ end
 RSpec::Core::RakeTask.new(:spec, :example_string) do |task, args|
   ENV["specs"] = "1"
   if args.example_string
-    ENV["partial_specs"] = "1"
     task.rspec_opts = %W[-e "#{args.example_string}" -f documentation]
   end
 end
@@ -27,14 +26,21 @@ task :spec => :build_dist
 task :spec do
   ENV.delete("specs")
 end
+task :spec => :build_tests
+
+task :build_tests do |task, args|
+  ENV["specs"] = "1"
+  sh "ruby -Ilib build_tests/build_tests.rb"
+  ENV.delete("specs")
+end
 
 # dspec task is useful to test the distributable release script, but is not
 # useful for coverage information.
 desc "Dist Specs"
 task :dspec, [:example_string] => :build_dist do |task, args|
-  FileUtils.rm_rf("test")
-  FileUtils.mkdir_p("test")
-  FileUtils.cp("dist/rscons", "test/rscons.rb")
+  FileUtils.rm_rf("test_run")
+  FileUtils.mkdir_p("test_run")
+  FileUtils.cp("dist/rscons", "test_run/rscons.rb")
   ENV["rscons_dist_specs"] = "1"
   Rake::Task["spec"].execute(args)
   ENV.delete("rscons_dist_specs")
