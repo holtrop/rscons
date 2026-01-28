@@ -1758,7 +1758,7 @@ context "Cache management" do
       end
       result = run_rscons(args: %w[-f cache_debugging.rb])
       expect_eq(result.stderr, "")
-      expect_match(result.stdout, /Target foo\.o needs rebuilding because dependency file simple\.c has changed/)
+      expect_match(result.stdout, /Target foo\.o needs rebuilding because dependency file \S*simple\.c has changed/)
     end
   end
 end

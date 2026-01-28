@@ -142,12 +142,14 @@ module Rscons
     #   - each cached dependency file's current checksum matches the checksum
     #     stored in the cache file
     def up_to_date?(targets, command, deps, env, options = {})
+      deps = deps.map {|dep| Util.absolute_path(dep)}
       Array(targets).each do |target|
-        cache_key = get_cache_key(target)
+        abstarget = Util.absolute_path(target)
+        cache_key = get_cache_key(abstarget)
 
-        unless Rscons.phony_target?(target)
+        unless Rscons.phony_target?(abstarget)
           # target file must exist on disk
-          unless File.exist?(target)
+          unless File.exist?(abstarget)
             if options[:debug]
               puts "Target #{target} needs rebuilding because it does not exist on disk"
             end
@@ -163,9 +165,9 @@ module Rscons
           return false
         end
 
-        unless Rscons.phony_target?(target)
+        unless Rscons.phony_target?(abstarget)
           # target must have the same checksum as when it was built last
-          unless @cache["targets"][cache_key]["checksum"] == lookup_checksum(target)
+          unless @cache["targets"][cache_key]["checksum"] == lookup_checksum(abstarget)
             if options[:debug]
               puts "Target #{target} needs rebuilding because it has been changed on disk since being built last"
             end
@@ -202,7 +204,7 @@ module Rscons
         end
 
         # set of user dependencies must match
-        user_deps = env.get_user_deps(target) || []
+        user_deps = env.get_user_deps(abstarget) || []
         cached_user_deps = @cache["targets"][cache_key]["user_deps"] || []
         cached_user_deps_fnames = cached_user_deps.map { |dc| dc["fname"] }
         unless user_deps == cached_user_deps_fnames
@@ -247,12 +249,16 @@ module Rscons
     # @return [void]
     def register_build(targets, command, deps, env, options = {})
       Array(targets).each do |target|
+        target = Util.absolute_path(target)
         target_checksum =
           if options[:side_effect] or Rscons.phony_target?(target)
             ""
           else
             calculate_checksum(target)
           end
+        deps = deps.map do |dep|
+          Util.absolute_path(dep)
+        end.uniq
         @cache["targets"][get_cache_key(target)] = {
           "command" => Digest::MD5.hexdigest(command.inspect),
           "checksum" => target_checksum,
