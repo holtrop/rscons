@@ -1,5 +1,5 @@
 if ENV["rscons_dist_specs"]
-  require_relative "../test/rscons"
+  require_relative "../test_run/rscons"
 else
   require "simplecov"
 
@@ -15,7 +15,7 @@ else
     else
       command_name "RSpec"
     end
-    add_filter "test/rscons.rb"
+    add_filter "test_run/rscons.rb"
     project_name "Rscons"
     merge_timeout 3600
     formatter(MyFormatter)

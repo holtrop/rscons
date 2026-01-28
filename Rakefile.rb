@@ -29,13 +29,15 @@ task :spec do
 end
 task :spec => :build_tests
 task :spec do
-  original_stdout = $stdout
-  sio = StringIO.new
-  $stdout = sio
-  SimpleCov.collate Dir["coverage/.resultset.json", "coverage/bt*/.resultset.json"]
-  $stdout = original_stdout
-  sio.string.lines.each do |line|
-    $stdout.write(line) unless line =~ /Coverage report generated for/
+  unless ENV["rscons_dist_specs"]
+    original_stdout = $stdout
+    sio = StringIO.new
+    $stdout = sio
+    SimpleCov.collate Dir["coverage/.resultset.json", "coverage/bt*/.resultset.json"]
+    $stdout = original_stdout
+    sio.string.lines.each do |line|
+      $stdout.write(line) unless line =~ /Coverage report generated for/
+    end
   end
 end
 
@@ -54,6 +56,7 @@ task :dspec, [:example_string] => :build_dist do |task, args|
   FileUtils.cp("dist/rscons", "test_run/rscons.rb")
   ENV["rscons_dist_specs"] = "1"
   Rake::Task["spec"].execute(args)
+  Rake::Task["build_tests"].execute(args)
   ENV.delete("rscons_dist_specs")
   FileUtils.rm_f(Dir.glob(".rscons-*"))
 end

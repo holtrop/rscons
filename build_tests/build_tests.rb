@@ -86,7 +86,7 @@ class Test
   def run_rscons(options = {})
     args = Array(options[:args]) || []
     if ENV["dist_specs"]
-      exe = "#{OWD}/test/rscons.rb"
+      exe = "#{OWD}/test_run/rscons.rb"
     else
       exe = "#{OWD}/bin/rscons"
     end
@@ -248,7 +248,7 @@ def run_tests
   tests = @focused_tests.size > 0 ? @focused_tests : @tests
   queue = Queue.new
   threads = {}
-  n_procs = `nproc`.to_i
+  n_procs = `nproc`.to_i * 2
   failure = false
   loop do
     break if threads.empty? && tests.empty?
