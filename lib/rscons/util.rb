@@ -16,6 +16,20 @@ module Rscons
         end
       end
 
+      # Return the absolute path for a given target if not a phony target.
+      #
+      # @param path [String, Symbol]
+      #   Given target name.
+      #
+      # @return Absolute path of given target.
+      def absolute_path(path)
+        if Rscons.phony_target?(path)
+          path
+        else
+          File.expand_path(path)
+        end
+      end
+
       # Colorize a builder run message.
       #
       # @param message [String]
