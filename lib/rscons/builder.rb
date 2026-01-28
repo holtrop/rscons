@@ -29,19 +29,27 @@ module Rscons
 
     # @return [String, Symbol]
     #   Target file name.
-    attr_accessor :target
+    attr_reader :target
 
-    # @return [Array<String>]
-    #   Source file name(s).
-    attr_accessor :sources
+    # @return [String, Symbol]
+    #   Absolute target file name.
+    attr_reader :abstarget
+
+    # @return [Array<String, Symbol>]
+    #   Source file names.
+    attr_reader :sources
+
+    # @return [Array<String, Symbol>]
+    #   Absolute source file names.
+    attr_reader :abssources
 
     # @return [Cache]
     #   Cache instance.
-    attr_accessor :cache
+    attr_reader :cache
 
     # @return [Environment]
     #   The {Environment} performing the build operation.
-    attr_accessor :env
+    attr_reader :env
 
     # @return [Hash, VarSet]
     #   Construction variables used to perform the build operation.
@@ -49,7 +57,7 @@ module Rscons
 
     # @return [Set<String>]
     #   Side effect file(s) produced when this builder runs.
-    attr_accessor :side_effects
+    attr_reader :side_effects
 
     # @return [Integer]
     #   Build step.
@@ -71,7 +79,11 @@ module Rscons
     #   Extra construction variables.
     def initialize(options)
       @target = options[:target]
-      @sources = options[:sources]
+      @abstarget = Util.absolute_path(@target)
+      @sources = Array(options[:sources])
+      @abssources = @sources.map do |source|
+        Util.absolute_path(source)
+      end
       @cache = options[:cache]
       @env = options[:env]
       @vars = options[:vars]
@@ -103,7 +115,7 @@ module Rscons
     # @return [void]
     def produces(*side_effects)
       side_effects.each do |side_effect|
-        side_effect_expanded = @env.expand(side_effect)
+        side_effect_expanded = Util.absolute_path(@env.expand(side_effect))
         @env.register_side_effect(side_effect_expanded)
         @side_effects << side_effect_expanded
       end

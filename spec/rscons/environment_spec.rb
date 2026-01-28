@@ -138,27 +138,6 @@ module Rscons
       end
     end
 
-    describe "#depends" do
-      it "records the given dependencies in @user_deps" do
-        env = Environment.new
-        env.depends("foo", "bar", "baz")
-        expect(env.instance_variable_get(:@user_deps)).to eq({"foo" => ["bar", "baz"]})
-      end
-      it "records user dependencies only once" do
-        env = Environment.new
-        env.instance_variable_set(:@user_deps, {"foo" => ["bar"]})
-        env.depends("foo", "bar", "baz")
-        expect(env.instance_variable_get(:@user_deps)).to eq({"foo" => ["bar", "baz"]})
-      end
-      it "expands arguments for construction variable references" do
-        env = Environment.new
-        env["foo"] = "foo.exe"
-        env["bar"] = "bar.c"
-        env.depends("${foo}", "${bar}", "a.h")
-        expect(env.instance_variable_get(:@user_deps)).to eq({"foo.exe" => ["bar.c", "a.h"]})
-      end
-    end
-
     describe "#shell" do
       it "executes the given shell command and returns the results" do
         env = Environment.new

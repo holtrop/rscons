@@ -18,15 +18,16 @@ module Rscons
 
       # Return the absolute path for a given target if not a phony target.
       #
-      # @param path [String, Symbol]
+      # @param path [String, Symbol, nil]
       #   Given target name.
       #
-      # @return Absolute path of given target.
+      # @return [String, Symbol, nil]
+      #   Absolute path of given target.
       def absolute_path(path)
-        if Rscons.phony_target?(path)
-          path
-        else
+        if path.is_a?(String)
           File.expand_path(path)
+        else
+          path
         end
       end
 

@@ -726,7 +726,7 @@ test 'supports build hooks to override the entire vars hash' do
   result = run_rscons(args: %w[-f build_hooks_override_vars.rb])
   expect_eq(result.stderr, "")
   verify_lines(lines(result.stdout), [
-    %r{gcc -c -o one.o -MMD -MF build/o/one.o.mf -Isrc -Isrc/one -Isrc/two -O1 src/two/two.c},
+    %r{gcc -c -o one.o -MMD -MF build/o/one.o.mf -Isrc -Isrc/one -Isrc/two -O1 src/one/one.c},
     %r{gcc -c -o two.o -MMD -MF build/o/two.o.mf -Isrc -Isrc/one -Isrc/two -O2 src/two/two.c},
   ])
   expect_truthy(File.exist?('one.o'))
@@ -3555,6 +3555,14 @@ test "supports a Barrier builder to order builds" do
   expect_match(slines[0], /B:t/)
   expect_match(slines[1], /B:t/)
   expect_match(slines[2], /B:one/)
+end
+
+test "maps relative paths to absolute paths for dependency resolution" do
+  test_dir "simple"
+  result = run_rscons(args: %w[-f abs_rel_paths.rb])
+  expect_eq(result.stderr, "")
+  expect_eq(result.status, 0)
+  expect_match(result.stdout, /three.*two.*one/m)
 end
 
 run_tests

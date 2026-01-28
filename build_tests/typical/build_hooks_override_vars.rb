@@ -3,7 +3,6 @@ env(echo: :command) do |env|
   env.add_build_hook do |builder|
     if builder.name == "Object" && builder.sources.first =~ %r{one\.c}
       builder.vars["CFLAGS"] << "-O1"
-      builder.sources = ['src/two/two.c']
     elsif builder.name == "Object" && builder.target =~ %r{two\.o}
       new_vars = builder.vars.clone
       new_vars["CFLAGS"] << "-O2"

@@ -371,8 +371,8 @@ module Rscons
           @builder_sets << build_builder_set
         end
         @builder_sets.last << builder
-        @build_steps += 1
-        @build_targets[target] = builder
+        @build_steps += 1 unless builder.is_a?(Rscons::Builders::Barrier)
+        @build_targets[builder.abstarget] = builder
         builder
       else
         super
@@ -396,8 +396,10 @@ module Rscons
         end
         expand(ud)
       end
+      target = Util.absolute_path(target)
       @user_deps[target] ||= []
-      (@user_deps[target] + user_deps).each do |ud|
+      user_deps.map! {|ud| Util.absolute_path(ud)}
+      user_deps.each do |ud|
         unless Rscons.phony_target?(ud) || @user_deps[target].include?(ud)
           @user_deps[target] << ud
         end
@@ -432,13 +434,13 @@ module Rscons
       targets = Array(targets)
       prerequisites = Array(prerequisites)
       targets.each do |target|
-        target = expand(target)
+        target = Util.absolute_path(expand(target))
         @registered_build_dependencies[target] ||= Set.new
         prerequisites.each do |prerequisite|
           if prerequisite.is_a?(Builder)
             prerequisite = prerequisite.target
           end
-          prerequisite = expand(prerequisite)
+          prerequisite = Util.absolute_path(expand(prerequisite))
           @registered_build_dependencies[target] << prerequisite
         end
       end
@@ -454,9 +456,9 @@ module Rscons
     #
     # @return [void]
     def produces(target, *side_effects)
-      target = expand(target)
+      abstarget = Util.absolute_path(expand(target))
       @builder_sets.reverse.each do |builder_set|
-        if builders = builder_set[target]
+        if builders = builder_set[abstarget]
           builders.last.produces(*side_effects)
           return
         end
@@ -473,7 +475,7 @@ module Rscons
     # @param side_effect [String]
     #   Side effect fiel name.
     def register_side_effect(side_effect)
-      @side_effects << side_effect
+      @side_effects << Util.absolute_path(side_effect)
     end
 
     # Return the list of user dependencies for a given target.
@@ -484,6 +486,7 @@ module Rscons
     #   List of user-specified dependencies for the target, or nil if none were
     #   specified.
     def get_user_deps(target)
+      target = Util.absolute_path(target)
       @user_deps[target]
     end
 
@@ -507,10 +510,11 @@ module Rscons
     # @return [String]
     #   Output file name.
     def register_dependency_build(target, source, suffix, vars, builder_class)
+      target = Util.absolute_path(target)
       output_fname = get_build_fname(source, suffix, builder_class)
       self.__send__(builder_class.name, output_fname, source, vars)
       @registered_build_dependencies[target] ||= Set.new
-      @registered_build_dependencies[target] << output_fname
+      @registered_build_dependencies[target] << Util.absolute_path(output_fname)
       output_fname
     end
 
@@ -587,6 +591,7 @@ module Rscons
     # @return [Builder, nil]
     #   The {Builder} for target, or +nil+ if none found.
     def builder_for(target)
+      target = Util.absolute_path(target)
       @build_targets[target]
     end
 
@@ -730,7 +735,7 @@ module Rscons
       # If no builder was found to run yet and there are threads available, try
       # to get a runnable builder from the builder set.
       targets_still_building = @threads.reduce([]) do |result, (thread, obj)|
-        result << builder_for_thread(thread).target
+        result << builder_for_thread(thread).abstarget
       end
       if @builder_sets.size > 0
         if builder = @builder_sets[0].get_next_builder_to_run(targets_still_building)

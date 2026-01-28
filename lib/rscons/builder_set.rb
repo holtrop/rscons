@@ -27,8 +27,8 @@ module Rscons
       #   env.Directory("dest")
       #   env.Install("dest", "bin")
       #   env.Install("dest", "share")
-      self[builder.target] ||= []
-      self[builder.target] << builder
+      self[builder.abstarget] ||= []
+      self[builder.abstarget] << builder
     end
 
     # Return the number of remaining build steps.
@@ -54,7 +54,7 @@ module Rscons
     #   The next builder to run.
     def get_next_builder_to_run(targets_still_building)
       to_build = self.find do |target, builders|
-        deps = builders.first.sources + (@build_dependencies[target] || []).to_a
+        deps = builders.first.abssources + (@build_dependencies[target] || []).to_a
         # All dependencies must have been built for this target to be ready to
         # build.
         deps.all? do |dep|
@@ -79,7 +79,7 @@ module Rscons
       # not find a builder to run above, then there might be a circular
       # dependency introduced by the user.
       if (self.size > 0) and targets_still_building.empty?
-        raise "Could not find a runnable builder. Possible circular dependency for #{self.keys.first}"
+        raise "Could not find a runnable builder. Possible circular dependency for #{self.first[1].first.target}"
       end
     end
 
