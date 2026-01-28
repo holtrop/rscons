@@ -33,6 +33,7 @@ module Rscons
     :Lex,
     :Library,
     :Object,
+    :Precompile,
     :Preprocess,
     :Program,
     :SharedLibrary,
@@ -152,6 +153,7 @@ require_relative "rscons/builders/disassemble"
 require_relative "rscons/builders/lex"
 require_relative "rscons/builders/library"
 require_relative "rscons/builders/object"
+require_relative "rscons/builders/precompile"
 require_relative "rscons/builders/preprocess"
 require_relative "rscons/builders/program"
 require_relative "rscons/builders/shared_library"

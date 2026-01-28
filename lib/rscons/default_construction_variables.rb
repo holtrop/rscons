@@ -43,6 +43,8 @@ module Rscons
     "DFLAGS" => [],
     "DISASM_CMD" => %w[${OBJDUMP} ${DISASM_FLAGS} ${_SOURCES}],
     "DISASM_FLAGS" => %w[--disassemble --source],
+    "DPC_CMD:ldc" => %w[${DC} -H -Hf ${_TARGET} -o- ${INCPREFIX}${D_IMPORT_PATH} ${DFLAGS} ${_SOURCES}],
+    "DPC_CMD:gdc" => %w[${DC} -H -Hf ${_TARGET} -fsyntax-only ${INCPREFIX}${D_IMPORT_PATH} ${DFLAGS} ${_SOURCES}],
     "DSUFFIX" => %w[.d],
     "D_IMPORT_PATH" => [],
     "INCPREFIX" => "-I",
