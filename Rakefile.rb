@@ -8,6 +8,8 @@ end
 require "rspec/core/rake_task"
 require "rake/clean"
 require "fileutils"
+require "simplecov"
+require "stringio"
 
 CLEAN.include %w[build_test_run .yardoc yard coverage test_run]
 CLOBBER.include %w[dist gen large_project pkg]
@@ -22,11 +24,20 @@ RSpec::Core::RakeTask.new(:spec, :example_string) do |task, args|
     task.rspec_opts = %W[-e "#{args.example_string}" -f documentation]
   end
 end
-task :spec => :build_dist
 task :spec do
   ENV.delete("specs")
 end
 task :spec => :build_tests
+task :spec do
+  original_stdout = $stdout
+  sio = StringIO.new
+  $stdout = sio
+  SimpleCov.collate Dir["coverage/.resultset.json", "coverage/bt*/.resultset.json"]
+  $stdout = original_stdout
+  sio.string.lines.each do |line|
+    $stdout.write(line) unless line =~ /Coverage report generated for/
+  end
+end
 
 task :build_tests do |task, args|
   ENV["specs"] = "1"

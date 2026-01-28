@@ -18,12 +18,13 @@ class Test
   attr_reader :name
   attr_accessor :output
 
-  def initialize(name, id, block)
-    @name = name
+  def initialize(desc, id, block)
+    @desc = desc
     @id = id
-    @run_dir = "#{BASE_DIR}/bt#{@id}"
+    @name = "bt#{sprintf("%03d", @id)}"
+    @run_dir = "#{BASE_DIR}/#{@name}"
     @block = block
-    @coverage_dir = "#{OWD}/coverage/bt#{@id}"
+    @coverage_dir = "#{OWD}/coverage/#{@name}"
     @output = ""
   end
 
@@ -103,7 +104,7 @@ end
 SimpleCov.start do
   root(#{OWD.inspect})
   coverage_dir(#{@coverage_dir.inspect})
-  command_name "build_tests"
+  command_name "#{@name}"
   filters.clear
   add_filter do |src|
     !(src.filename[SimpleCov.root])
@@ -133,7 +134,7 @@ EOF
     end
     # Remove output lines generated as a result of the test environment
     stderr = stderr.lines.find_all do |line|
-      not (line =~ /Warning: coverage data provided by Coverage.*exceeds number of lines/)
+      not (line =~ /Warning: coverage data provided by Coverage.*exceeds number of lines|Stopped processing SimpleCov/)
     end.join
     RunResults.new(stdout, stderr, status)
   end
