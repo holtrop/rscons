@@ -3565,4 +3565,12 @@ test "maps relative paths to absolute paths for dependency resolution" do
   expect_match(result.stdout, /three.*two.*one/m)
 end
 
+test "manual dependencies can be set on phony targets" do
+  test_dir "simple"
+  result = run_rscons(args: %w[-f depends_phony.rb])
+  expect_eq(result.stderr, "")
+  expect_eq(result.status, 0)
+  expect_match(result.stdout, /two.*one/m)
+end
+
 run_tests

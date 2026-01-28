@@ -389,14 +389,13 @@ module Rscons
       if target.is_a?(Builder)
         target = target.target
       end
-      target = expand(target.to_s)
       user_deps = user_deps.map do |ud|
         if ud.is_a?(Builder)
           ud = ud.target
         end
         expand(ud)
       end
-      target = Util.absolute_path(target)
+      target = Util.absolute_path(expand(target))
       @user_deps[target] ||= []
       user_deps.map! {|ud| Util.absolute_path(ud)}
       user_deps.each do |ud|
