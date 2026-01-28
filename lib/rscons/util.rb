@@ -156,6 +156,33 @@ module Rscons
         result
       end
 
+      # Return a list of paths matching the specified pattern(s).
+      #
+      # A pattern can contain a "/**" component to recurse through directories.
+      # If the pattern ends with "/**" then only the recursive list of
+      # directories will be returned.
+      #
+      # Examples:
+      # - "src/**": return all directories under "src", recursively (including
+      #   "src" itself).
+      # - "src/**/*": return all files and directories recursively under the src
+      #   directory.
+      # - "src/**/*.c": return all .c files recursively under the src directory.
+      # - "dir/*/": return all directories in dir, but no files.
+      #
+      # @return [Array<String>] Paths matching the specified pattern(s).
+      def glob(*patterns)
+        require "pathname"
+        patterns.reduce([]) do |result, pattern|
+          if pattern.end_with?("/**")
+            pattern += "/"
+          end
+          result += Dir.glob(pattern).map do |path|
+            Pathname.new(path.gsub("\\", "/")).cleanpath.to_s
+          end
+        end.sort
+      end
+
       # Make a relative path corresponding to a possibly absolute one.
       #
       # @param path [String]

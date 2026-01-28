@@ -34,15 +34,7 @@ module Rscons
       #
       # @return [Array<String>] Paths matching the specified pattern(s).
       def glob(*patterns)
-        require "pathname"
-        patterns.reduce([]) do |result, pattern|
-          if pattern.end_with?("/**")
-            pattern += "/"
-          end
-          result += Dir.glob(pattern).map do |path|
-            Pathname.new(path.gsub("\\", "/")).cleanpath.to_s
-          end
-        end.sort
+        Util.glob(*patterns)
       end
 
       # Download a file.
