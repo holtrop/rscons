@@ -3545,4 +3545,16 @@ test "supports building LLVM assembly files with the Program builder in direct m
   expect_match(`./llvmtest.exe`, /hello again/)
 end
 
+test "supports a Barrier builder to order builds" do
+  test_dir "simple"
+  result = run_rscons(args: %w[-f barrier_builder.rb])
+  expect_eq(result.stderr, "")
+  expect_eq(result.status, 0)
+  slines = lines(result.stdout)
+  expect_eq(slines.size, 3)
+  expect_match(slines[0], /B:t/)
+  expect_match(slines[1], /B:t/)
+  expect_match(slines[2], /B:one/)
+end
+
 run_tests
