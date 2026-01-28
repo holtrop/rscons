@@ -291,6 +291,17 @@ module Rscons
       end
     end
 
+    # Get a path under the build root for precompile outputs.
+    #
+    # @param end_path [String]
+    #   Path to append to precompile build root.
+    #
+    # @return [String]
+    #   Precompile directory name.
+    def get_pc_build_dir(end_path)
+      "#{@build_root}/pc/#{Util.make_relative_path(end_path)}"
+    end
+
     # Build all build targets specified in the Environment.
     #
     # When a block is passed to Environment.new, this method is automatically
@@ -602,6 +613,38 @@ module Rscons
     # across a barrier.
     def barrier
       @builder_sets << build_builder_set
+    end
+
+    # Set up builders and barrier for a precompile phase if needed.
+    #
+    # @param sources [Array<String>]
+    #   Sources for the build operation.
+    #
+    # @return [Symbol, nil]
+    #   Barrier target name if a precompile phase is needed, otherwise nil.
+    def setup_precompile(sources)
+      return unless sources.find {|s| s.end_with?(".d")}
+      d_import_paths = self.expand_varref("${D_IMPORT_PATH}")
+      precompile_paths = []
+      import_paths_to_precompile_paths = {}
+      d_import_paths.each do |import_path|
+        precompile_path = get_pc_build_dir(import_path)
+        precompile_paths << precompile_path
+        import_paths_to_precompile_paths[import_path] = precompile_path
+      end
+      barrier_target = Rscons.gen_phony_target
+      self.Barrier(barrier_target)
+      sources.each do |source|
+        next unless source.end_with?(".d")
+        next unless module_name = Util.get_module_name(source)
+        next unless import_path = Util.find_import_path_for_d_source(d_import_paths, source, module_name)
+        precompile_path = import_paths_to_precompile_paths[import_path]
+        pctarget = "#{precompile_path}/#{module_name.gsub(".", "/")}.di"
+        self.Precompile(pctarget, source)
+        self.depends(barrier_target, pctarget)
+      end
+      self["D_IMPORT_PATH"] = precompile_paths + self["D_IMPORT_PATH"]
+      barrier_target
     end
 
     private

@@ -31,6 +31,25 @@ module Rscons
         end
       end
 
+      # Remove any stale .di files from the precompile path.
+      #
+      # @param pc_path [String]
+      #   Path to precompile build directory containing .di generated
+      #   interface files.
+      # @param import_path [String]
+      #   D import path containing .d source files.
+      #
+      # @return [void]
+      def clean_d_precompile_path(pc_path, import_path)
+        glob("#{pc_path}/**/*.di").each do |di_path|
+          end_path = di_path[(pc_path.size+1)..]
+          path = "#{import_path}/#{end_path}".sub(/\.di$/, ".d")
+          unless File.exist?(path)
+            FileUtils.rm_f(path)
+          end
+        end
+      end
+
       # Colorize a builder run message.
       #
       # @param message [String]
@@ -135,6 +154,29 @@ module Rscons
         end
       end
 
+      # Find the D import path that will be used to import the given module.
+      #
+      # @param import_paths [Array<String>]
+      #   Import paths.
+      # @param source [String]
+      #   Source file name.
+      # @param module_name [String]
+      #   Module name.
+      #
+      # @return [String, nil]
+      #   Import path used to import the given module.
+      def find_import_path_for_d_source(import_paths, source, module_name)
+        source = source.gsub("\\", "/")
+        module_path = module_name.gsub(".", "/") + ".d"
+        import_paths.each do |import_path|
+          path = "#{import_path}/#{module_path}".gsub("\\", "/")
+          if path == source
+            return import_path
+          end
+        end
+        nil
+      end
+
       # Format an elapsed time in human-readable format.
       #
       # @return [String]
@@ -154,6 +196,25 @@ module Rscons
         end
         result += "#{seconds}s"
         result
+      end
+
+      # Get the module name for a D source file.
+      #
+      # @param source_path [String]
+      #   D source file.
+      #
+      # @return [String, nil]
+      #   Module name.
+      def get_module_name(source_path)
+        if File.exist?(source_path)
+          if File.binread(source_path) =~ /^\s*module\s(\S*);/
+            return $1
+          end
+          name = File.basename(source_path).sub(/\.d$/, "")
+          if name =~ /^\w+$/
+            return name
+          end
+        end
       end
 
       # Return a list of paths matching the specified pattern(s).

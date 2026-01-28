@@ -1,0 +1,8 @@
+configure do
+  check_d_compiler
+end
+
+env do |env|
+  env["D_IMPORT_PATH"] << "src"
+  env.Program("hello-d.exe", glob("src/*.d"))
+end

@@ -150,8 +150,8 @@ module Rscons
         unless Rscons.phony_target?(abstarget)
           # target file must exist on disk
           unless File.exist?(abstarget)
-            if options[:debug]
-              puts "Target #{target} needs rebuilding because it does not exist on disk"
+            if options[:debug] || ENV["RSCONS_CACHE_DEBUG"]
+              puts "Cache: Target #{target} needs rebuilding because it does not exist on disk"
             end
             return false
           end
@@ -159,8 +159,8 @@ module Rscons
 
         # target must be registered in the cache
         unless @cache["targets"].has_key?(cache_key)
-          if options[:debug]
-            puts "Target #{target} needs rebuilding because there is no cached build information for it"
+          if options[:debug] || ENV["RSCONS_CACHE_DEBUG"]
+            puts "Cache: up_to_date?: Target #{target} needs rebuilding because there is no cached build information for it"
           end
           return false
         end
@@ -168,8 +168,8 @@ module Rscons
         unless Rscons.phony_target?(abstarget)
           # target must have the same checksum as when it was built last
           unless @cache["targets"][cache_key]["checksum"] == lookup_checksum(abstarget)
-            if options[:debug]
-              puts "Target #{target} needs rebuilding because it has been changed on disk since being built last"
+            if options[:debug] || ENV["RSCONS_CACHE_DEBUG"]
+              puts "Cache: Target #{target} needs rebuilding because it has been changed on disk since being built last"
             end
             return false
           end
@@ -177,8 +177,8 @@ module Rscons
 
         # command used to build target must be identical
         unless @cache["targets"][cache_key]["command"] == Digest::MD5.hexdigest(command.inspect)
-          if options[:debug]
-            puts "Target #{target} needs rebuilding because the command used to build it has changed"
+          if options[:debug] || ENV["RSCONS_CACHE_DEBUG"]
+            puts "Cache: up_to_date?: Target #{target} needs rebuilding because the command used to build it has changed"
           end
           return false
         end
@@ -188,16 +188,16 @@ module Rscons
         if options[:strict_deps]
           # depedencies passed in must exactly equal those in the cache
           unless deps == cached_deps_fnames
-            if options[:debug]
-              puts "Target #{target} needs rebuilding because the :strict_deps option is given and the set of dependencies does not match the previous set of dependencies"
+            if options[:debug] || ENV["RSCONS_CACHE_DEBUG"]
+              puts "Cache: up_to_date?: Target #{target} needs rebuilding because the :strict_deps option is given and the set of dependencies does not match the previous set of dependencies"
             end
             return false
           end
         else
           # all dependencies passed in must exist in cache (but cache may have more)
           unless (Set.new(deps) - Set.new(cached_deps_fnames)).empty?
-            if options[:debug]
-              puts "Target #{target} needs rebuilding because there are new dependencies"
+            if options[:debug] || ENV["RSCONS_CACHE_DEBUG"]
+              puts "Cache: up_to_date?: Target #{target} needs rebuilding because there are new dependencies"
             end
             return false
           end
@@ -208,8 +208,8 @@ module Rscons
         cached_user_deps = @cache["targets"][cache_key]["user_deps"] || []
         cached_user_deps_fnames = cached_user_deps.map { |dc| dc["fname"] }
         unless user_deps == cached_user_deps_fnames
-          if options[:debug]
-            puts "Target #{target} needs rebuilding because the set of user-specified dependency files has changed"
+          if options[:debug] || ENV["RSCONS_CACHE_DEBUG"]
+            puts "Cache: up_to_date?: Target #{target} needs rebuilding because the set of user-specified dependency files has changed"
           end
           return false
         end
@@ -217,11 +217,15 @@ module Rscons
         # all cached dependencies must have their checksums match
         (cached_deps + cached_user_deps).each do |dep_cache|
           unless dep_cache["checksum"] == lookup_checksum(dep_cache["fname"])
-            if options[:debug]
-              puts "Target #{target} needs rebuilding because dependency file #{dep_cache["fname"]} has changed"
+            if options[:debug] || ENV["RSCONS_CACHE_DEBUG"]
+              puts "Cache: up_to_date?: Target #{target} needs rebuilding because dependency file #{dep_cache["fname"]} has changed"
             end
             return false
           end
+        end
+
+        if ENV["RSCONS_CACHE_DEBUG"]
+          puts "Cache: up_to_date?: Target #{target} is up to date"
         end
       end
 
@@ -371,7 +375,7 @@ module Rscons
     def initialize!
       @cache = JSON.load(File.read(cache_file)) rescue {}
       unless @cache.is_a?(Hash)
-        $stderr.puts "Warning: #{cache_file} was corrupt. Contents:\n#{@cache.inspect}"
+        $stderr.puts "Cache: warning: #{cache_file} was corrupt. Contents:\n#{@cache.inspect}"
         @cache = {}
       end
       @cache["targets"] ||= {}
@@ -387,6 +391,8 @@ module Rscons
     #
     # @return [String] The file's checksum.
     def lookup_checksum(file)
+      file = Util.absolute_path(file)
+      puts "Cache: lookup_checksum(#{file})" if ENV["RSCONS_CACHE_DEBUG"]
       @lookup_checksums[file] || calculate_checksum(file)
     end
 
@@ -396,7 +402,10 @@ module Rscons
     #
     # @return [String] The file's checksum.
     def calculate_checksum(file)
-      @lookup_checksums[file] = Digest::MD5.hexdigest(File.read(file, mode: "rb")) rescue ""
+      file = Util.absolute_path(file)
+      cs = Digest::MD5.hexdigest(File.read(file, mode: "rb")) rescue ""
+      puts "Cache: calculate_checksum(#{file}) = #{cs}" if ENV["RSCONS_CACHE_DEBUG"]
+      @lookup_checksums[file] = cs
     end
 
   end

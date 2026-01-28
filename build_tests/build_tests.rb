@@ -14,6 +14,7 @@ TESTS_LINE = File.read(__FILE__).lines.find_index {|line| line.chomp == "# Tests
 RunResults = Struct.new(:stdout, :stderr, :status)
 
 class Test
+  attr_reader :desc
   attr_reader :id
   attr_reader :name
   attr_accessor :output
@@ -269,7 +270,7 @@ def run_tests
       if test.output.start_with?("<pass>")
         Rscons::Ansi.write($stdout, :green, ".", :reset)
       else
-        Rscons::Ansi.write($stdout, :red, "F", :reset, "\n")
+        Rscons::Ansi.write($stdout, :red, "F: ", test.desc, :reset, "\n")
         $stderr.write(test.output)
         failure = true
       end
@@ -1491,7 +1492,7 @@ context "Cache management" do
       fh.puts("[1]")
     end
     result = run_rscons
-    expect_match(result.stderr, /Warning.*was corrupt. Contents:/)
+    expect_match(result.stderr, /warning.*was corrupt. Contents:/)
   end
 
   test "forces a build when the target file does not exist and is not in the cache" do
@@ -3571,6 +3572,18 @@ test "manual dependencies can be set on phony targets" do
   expect_eq(result.stderr, "")
   expect_eq(result.status, 0)
   expect_match(result.stdout, /two.*one/m)
+end
+
+test "D precompile phase allows avoids rebuilding modules when dependency modules change but not their interface" do
+  test_dir "d_precompile"
+  result = run_rscons
+  expect_eq(result.stderr, "")
+  expect_eq(result.status, 0)
+  File.binwrite("src/mod.d", File.binread("src/mod.d") + "\n")
+  result = run_rscons
+  expect_eq(result.stderr, "")
+  expect_eq(result.status, 0)
+  expect_falsey(result.stdout =~ /Compiling .*main\.d/)
 end
 
 run_tests

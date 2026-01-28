@@ -45,14 +45,14 @@ module Rscons
     describe "#lookup_checksum" do
       it "does not re-calculate the checksum when it is already cached" do
         cache = build_from({})
-        cache.instance_variable_set(:@lookup_checksums, {"f1" => "f1.chk"})
+        cache.instance_variable_set(:@lookup_checksums, {File.expand_path("f1") => "f1.chk"})
         expect(cache).to_not receive(:calculate_checksum)
         expect(cache.send(:lookup_checksum, "f1")).to eq "f1.chk"
       end
 
       it "calls calculate_checksum when the checksum is not cached" do
         cache = build_from({})
-        expect(cache).to receive(:calculate_checksum).with("f1").and_return("ck")
+        expect(cache).to receive(:calculate_checksum).with(File.expand_path("f1")).and_return("ck")
         expect(cache.send(:lookup_checksum, "f1")).to eq "ck"
       end
     end
@@ -60,7 +60,7 @@ module Rscons
     describe "#calculate_checksum" do
       it "calculates the MD5 of the file contents" do
         contents = "contents"
-        expect(File).to receive(:read).with("fname", mode: "rb").and_return(contents)
+        expect(File).to receive(:read).with(File.expand_path("fname"), mode: "rb").and_return(contents)
         expect(Digest::MD5).to receive(:hexdigest).with(contents).and_return("the_checksum")
         expect(build_from({}).send(:calculate_checksum, "fname")).to eq "the_checksum"
       end
