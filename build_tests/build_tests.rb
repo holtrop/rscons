@@ -26,6 +26,7 @@ class Test
     @block = block
     @coverage_dir = "#{OWD}/coverage/#{@name}"
     @output = ""
+    @invocation = 0
   end
 
   def run(outfh)
@@ -84,6 +85,7 @@ class Test
   end
 
   def run_rscons(options = {})
+    @invocation += 1
     args = Array(options[:args]) || []
     if ENV["dist_specs"]
       exe = "#{OWD}/test_run/rscons.rb"
@@ -104,7 +106,7 @@ end
 SimpleCov.start do
   root(#{OWD.inspect})
   coverage_dir(#{@coverage_dir.inspect})
-  command_name "#{@name}"
+  command_name "#{@name}_#{@invocation}"
   filters.clear
   add_filter do |src|
     !(src.filename[SimpleCov.root])
