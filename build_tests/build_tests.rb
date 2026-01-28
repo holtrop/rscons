@@ -260,9 +260,9 @@ def run_tests
       pipew.close
       test.output = piper.read
       if test.output.start_with?("<pass>")
-        $stdout.write(".")
+        Rscons::Ansi.write($stdout, :green, ".", :reset)
       else
-        $stdout.write("F\n")
+        Rscons::Ansi.write($stdout, :red, "F", :reset, "\n")
         $stderr.write(test.output)
         failure = true
       end
