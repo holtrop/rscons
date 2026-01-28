@@ -247,7 +247,14 @@ def run_tests
   rm_rf(BASE_DIR)
   FileUtils.mkdir_p(BASE_DIR)
   keep_run_dir = false
-  tests = @focused_tests.size > 0 ? @focused_tests : @tests
+  tests =
+    if @focused_tests.size > 0
+      sz = @focused_tests.size
+      Rscons::Ansi.write($stdout, :cyan, "Focusing on #{sz} test#{sz > 1 ? "s" : ""}", :reset, "\n")
+      @focused_tests
+    else
+      @tests
+    end
   queue = Queue.new
   threads = {}
   n_procs = `nproc`.to_i * 2
