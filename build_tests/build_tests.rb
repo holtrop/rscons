@@ -256,6 +256,14 @@ def run_tests
     else
       @tests
     end
+  if ENV["build_tests_filter"]
+    orig_test_count = tests.size
+    re = Regexp.new(ENV["build_tests_filter"])
+    tests = tests.select do |test|
+      test.desc =~ re
+    end
+    puts "Filter selected #{tests.size}/#{orig_test_count} tests"
+  end
   queue = Queue.new
   threads = {}
   n_procs = `nproc`.to_i * 2
