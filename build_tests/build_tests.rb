@@ -3583,15 +3583,17 @@ test "manual dependencies can be set on phony targets" do
 end
 
 test "D precompile phase allows avoids rebuilding modules when dependency modules change but not their interface" do
-  test_dir "d_precompile"
-  result = run_rscons
-  expect_eq(result.stderr, "")
-  expect_eq(result.status, 0)
-  File.binwrite("src/mod.d", File.binread("src/mod.d") + "\n")
-  result = run_rscons
-  expect_eq(result.stderr, "")
-  expect_eq(result.status, 0)
-  expect_falsey(result.stdout =~ /Compiling .*main\.d/)
+  %w[ldc2 gdc].each do |d_compiler|
+    test_dir "d_precompile"
+    result = run_rscons(env: {"d_compiler" => d_compiler})
+    expect_eq(result.stderr, "")
+    expect_eq(result.status, 0)
+    File.binwrite("src/mod.d", File.binread("src/mod.d") + "\n")
+    result = run_rscons(env: {"d_compiler" => d_compiler})
+    expect_eq(result.stderr, "")
+    expect_eq(result.status, 0)
+    expect_falsey(result.stdout =~ /Compiling .*main\.d/)
+  end
 end
 
 run_tests

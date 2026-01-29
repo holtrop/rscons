@@ -1,5 +1,5 @@
 configure do
-  check_d_compiler
+  check_d_compiler ENV["d_compiler"]
 end
 
 env do |env|
