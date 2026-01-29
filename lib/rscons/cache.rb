@@ -224,9 +224,7 @@ module Rscons
           end
         end
 
-        if ENV["RSCONS_CACHE_DEBUG"]
-          puts "Cache: up_to_date?: Target #{target} is up to date"
-        end
+        puts "Cache: up_to_date?: Target #{target} is up to date" if ENV["RSCONS_CACHE_DEBUG"]
       end
 
       true
