@@ -630,6 +630,7 @@ module Rscons
       d_import_paths.each do |import_path|
         precompile_path = get_pc_build_dir(import_path)
         precompile_paths << precompile_path
+        Util.clean_d_precompile_path(precompile_path, import_path)
         import_paths_to_precompile_paths[import_path] = precompile_path
       end
       barrier_target = Rscons.gen_phony_target

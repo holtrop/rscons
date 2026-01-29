@@ -3596,4 +3596,15 @@ test "D precompile phase allows avoids rebuilding modules when dependency module
   end
 end
 
+test "D precompile paths are cleaned of stale interface files" do
+  test_dir "d_precompile"
+  result = run_rscons(env: {"d_compiler" => "ldc2"})
+  expect_eq(result.stderr, "")
+  expect_eq(result.status, 0)
+  FileUtils.rm_f("src/mod2.d")
+  result = run_rscons(env: {"d_compiler" => "ldc2"})
+  expect_ne(result.stderr, "")
+  expect_ne(result.status, 0)
+end
+
 run_tests

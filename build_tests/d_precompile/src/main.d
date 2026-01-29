@@ -1,5 +1,6 @@
 import std.stdio;
 import mod;
+import mod2;
 
 void main()
 {

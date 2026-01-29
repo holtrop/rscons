@@ -45,7 +45,7 @@ module Rscons
           end_path = di_path[(pc_path.size+1)..]
           path = "#{import_path}/#{end_path}".sub(/\.di$/, ".d")
           unless File.exist?(path)
-            FileUtils.rm_f(path)
+            FileUtils.rm_f(di_path)
           end
         end
       end
