@@ -522,7 +522,11 @@ module Rscons
     def register_dependency_build(target, source, suffix, vars, builder_class)
       target = Util.absolute_path(target)
       output_fname = get_build_fname(source, suffix, builder_class)
-      self.__send__(builder_class.name, output_fname, source, vars)
+      @_registered_dependency_targets ||= Set.new
+      unless @_registered_dependency_targets.include?(output_fname)
+        self.__send__(builder_class.name, output_fname, source, vars)
+        @_registered_dependency_targets << output_fname
+      end
       @registered_build_dependencies[target] ||= Set.new
       @registered_build_dependencies[target] << Util.absolute_path(output_fname)
       output_fname
@@ -641,7 +645,11 @@ module Rscons
         next unless import_path = Util.find_import_path_for_d_source(d_import_paths, source, module_name)
         precompile_path = import_paths_to_precompile_paths[import_path]
         pctarget = "#{precompile_path}/#{module_name.gsub(".", "/")}.di"
-        self.Precompile(pctarget, source)
+        @_precompile_targets ||= Set.new
+        unless @_precompile_targets.include?(pctarget)
+          self.Precompile(pctarget, source)
+          @_precompile_targets << pctarget
+        end
         self.depends(barrier_target, pctarget)
       end
       self["D_IMPORT_PATH"] = precompile_paths + self["D_IMPORT_PATH"]
