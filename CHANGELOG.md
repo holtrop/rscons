@@ -1,3 +1,21 @@
+## v3.4.0
+
+### New Features
+
+- #178 - Add precompile phase to generate D Interface (.di) files
+- Add Barrier builder
+
+### Fixes
+
+- Fix a couple cases where an absolute path and a relative path both pointing
+  to the same file would not resolve build order properly
+- Fix manual user dependencies on a phony target not resolving build order
+  correctly
+
+### New Developer Features
+
+- Speed up build test execution by parallelizing
+
 ## v3.3.0
 
 ### New Features
