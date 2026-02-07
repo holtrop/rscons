@@ -1,3 +1,9 @@
+## v3.4.1
+
+### Fixes
+
+- Fix issue with running D precompile phase in parallel
+
 ## v3.4.0
 
 ### New Features
