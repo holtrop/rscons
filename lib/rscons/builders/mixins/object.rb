@@ -80,6 +80,13 @@ module Rscons
               else
                 "#{@target}#{depfilesuffix}"
               end
+            @vars["D_IMPORT_PATH"] = @env.expand_varref("${D_IMPORT_PATH}").map do |import_path|
+              if @env.d_precompile_import_paths.include?(import_path)
+                [@env.d_precompile_import_paths[import_path], import_path]
+              else
+                import_path
+              end
+            end.flatten
             @cache.mkdir_p(File.dirname(@vars["_DEPFILE"]))
             command = @env.build_command(@command_template, @vars)
             self.produces(@vars["_DEPFILE"])

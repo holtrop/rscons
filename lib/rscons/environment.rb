@@ -56,6 +56,9 @@ module Rscons
     # @return [Hash] Set of !{"builder_name" => builder_object} pairs.
     attr_reader :builders
 
+    # return [Hash] D precompile import paths (import path => precompile path).
+    attr_reader :d_precompile_import_paths
+
     # @return [Symbol] :command, :short, or :off
     attr_accessor :echo
 
@@ -120,6 +123,7 @@ module Rscons
         end
       @n_threads = Rscons.application.n_threads
       @build_steps = 0
+      @d_precompile_import_paths = {}
       self.class.register(self)
       if block
         Environment.running_environment = self
@@ -630,12 +634,11 @@ module Rscons
       return unless sources.find {|s| s.end_with?(".d")}
       d_import_paths = self.expand_varref("${D_IMPORT_PATH}")
       precompile_paths = []
-      import_paths_to_precompile_paths = {}
       d_import_paths.each do |import_path|
         precompile_path = get_pc_build_dir(import_path)
         precompile_paths << precompile_path
         Util.clean_d_precompile_path(precompile_path, import_path)
-        import_paths_to_precompile_paths[import_path] = precompile_path
+        @d_precompile_import_paths[import_path] = precompile_path
       end
       barrier_target = Rscons.gen_phony_target
       self.Barrier(barrier_target)
@@ -643,7 +646,7 @@ module Rscons
         next unless source.end_with?(".d")
         next unless module_name = Util.get_module_name(source)
         next unless import_path = Util.find_import_path_for_d_source(d_import_paths, source, module_name)
-        precompile_path = import_paths_to_precompile_paths[import_path]
+        precompile_path = @d_precompile_import_paths[import_path]
         pctarget = "#{precompile_path}/#{module_name.gsub(".", "/")}.di"
         @_precompile_targets ||= Set.new
         unless @_precompile_targets.include?(pctarget)
@@ -652,7 +655,6 @@ module Rscons
         end
         self.depends(barrier_target, pctarget)
       end
-      self["D_IMPORT_PATH"] = precompile_paths + self["D_IMPORT_PATH"]
       barrier_target
     end
 
