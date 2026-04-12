@@ -3593,6 +3593,19 @@ test "manual dependencies can be set on phony targets" do
   expect_match(result.stdout, /two.*one/m)
 end
 
+test "D precompile phase uses the configured D compiler" do
+  test_dir "d_precompile"
+  create_exe "my-d-compiler", %[exec gdc "$@"]
+
+  result = run_rscons(args: %w[-f precompile_custom_dc.rb])
+  expect_eq(result.stderr, "")
+  expect_eq(result.status, 0)
+  slines = lines(result.stdout)
+  verify_lines(slines, [%r{my-d-compiler -H -Hf build/pc/src/main.di -fsyntax-only -Isrc src/main.d}])
+  verify_lines(slines, [%r{my-d-compiler -H -Hf build/pc/src/mod.di -fsyntax-only -Isrc src/mod.d}])
+  verify_lines(slines, [%r{my-d-compiler -H -Hf build/pc/src/mod2.di -fsyntax-only -Isrc src/mod2.d}])
+end
+
 test "D precompile phase allows avoids rebuilding modules when dependency modules change but not their interface" do
   %w[ldc2 gdc].each do |d_compiler|
     test_dir "d_precompile"
