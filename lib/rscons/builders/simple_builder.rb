@@ -23,7 +23,7 @@ module Rscons
       #   Extra construction variables.
       # @param run_proc [Proc]
       #   A Proc to execute when the builder runs. The provided block must
-      #   provide the have the same signature as {Builder#run}.
+      #   have the same signature as {Builder#run}.
       def initialize(name, options, &run_proc)
         @name = name
         super(options)

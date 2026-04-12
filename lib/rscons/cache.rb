@@ -186,7 +186,7 @@ module Rscons
         cached_deps = @cache["targets"][cache_key]["deps"] || []
         cached_deps_fnames = cached_deps.map { |dc| dc["fname"] }
         if options[:strict_deps]
-          # depedencies passed in must exactly equal those in the cache
+          # dependencies passed in must exactly equal those in the cache
           unless deps == cached_deps_fnames
             if options[:debug] || ENV["RSCONS_CACHE_DEBUG"]
               puts "Cache: up_to_date?: Target #{target} needs rebuilding because the :strict_deps option is given and the set of dependencies does not match the previous set of dependencies"

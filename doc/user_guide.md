@@ -621,7 +621,8 @@ Optionally specifies an array of paths to look for the header file in.
 
 ###> Checking for a D Import
 
-The `check_d_import` method can be used to check for the presence of D import.
+The `check_d_import` method can be used to check for the presence of a D
+import.
 
 This method takes the name of the import to check for as the first argument.
 
@@ -1407,7 +1408,7 @@ The command `./rscons --variants kde,release` would build just "prog-kde-release
   * `path_set` (see ${#PATH Management})
   * `project_name` (see ${#Configure Task})
   * `rscons` (see ${#Using Subsidiary Build Scripts: The rscons Method})
-  * `sh` (see (${#Executing Commands: The sh Method})
+  * `sh` (see ${#Executing Commands: The sh Method})
   * `task` (see ${#Tasks})
   * `uninstall` (see ${#Uninstall Task})
   * `variant` (see ${#Variants})
@@ -1611,7 +1612,7 @@ end
 ### Adding New Languages
 
 The `Object` and `SharedObject` builders that ship with Rscons have an API that
-allows the user to register extra languages that can be suppored by the
+allows the user to register extra languages that can be supported by the
 builders.
 In fact, the built-in support for assembly, C, C++, D, and LLVM compilation
 all make use of this built-in API.
@@ -1729,7 +1730,7 @@ The base constructor will set several instance attributes within the builder:
 
 ####> Custom Builder Operation
 
-In order for a builder to run, the builder class must implement a the
+In order for a builder to run, the builder class must implement the
 `Builder#run()` method.
 Generally, the `run()` method will use the source file(s) to produce the target
 file.

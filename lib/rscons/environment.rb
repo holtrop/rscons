@@ -56,7 +56,7 @@ module Rscons
     # @return [Hash] Set of !{"builder_name" => builder_object} pairs.
     attr_reader :builders
 
-    # return [Hash] D precompile import paths (import path => precompile path).
+    # @return [Hash] D precompile import paths (import path => precompile path).
     attr_reader :d_precompile_import_paths
 
     # @return [Symbol] :command, :short, or :off
@@ -487,7 +487,7 @@ module Rscons
     # @api private
     #
     # @param side_effect [String]
-    #   Side effect fiel name.
+    #   Side effect file name.
     def register_side_effect(side_effect)
       @side_effects << Util.absolute_path(side_effect)
     end

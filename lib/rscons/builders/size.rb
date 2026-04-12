@@ -2,7 +2,6 @@ module Rscons
   module Builders
     # Run the "size" utility on an executable and store its results in the
     # target file.
-    # input file.
     #
     # Examples::
     #   env.Size("^/project.size", "^/project.elf")
