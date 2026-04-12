@@ -895,13 +895,49 @@ unless RUBY_PLATFORM =~ /mingw|msys|darwin/
     result = run_rscons(args: %w[-f shared_library_d_ldc2.rb])
     expect_eq(result.stderr, "")
     slines = lines(result.stdout)
-    verify_lines(slines, [%r{ldc2 -c -of build/o/_shared/src/lib/one.d.o(bj)? --relocation-model=pic src/lib/one.d}])
-    verify_lines(slines, [%r{ldc2 -c -of build/o/_shared/src/lib/two.d.o(bj)? --relocation-model=pic src/lib/two.d}])
+    verify_lines(slines, [%r{ldc2 -c -of build/o/_shared/src/lib/one.d.o(bj)? -deps=build/o/_shared/src/lib/one.d.o(bj)?.mf --relocation-model=pic src/lib/one.d}])
+    verify_lines(slines, [%r{ldc2 -c -of build/o/_shared/src/lib/two.d.o(bj)? -deps=build/o/_shared/src/lib/two.d.o(bj)?.mf --relocation-model=pic src/lib/two.d}])
     if RUBY_PLATFORM =~ /mingw|msys/
       verify_lines(slines, [%r{Linking mine.dll}])
     else
       verify_lines(slines, [%r{ldc2 -of libmine.so}])
     end
+  end
+
+  test "rebuilds D shared library objects when dependencies change" do
+    test_dir("d")
+
+    result = run_rscons(args: %w[-f shared_library_depgen.rb])
+    expect_eq(result.stderr, "")
+    slines = lines(result.stdout)
+    verify_lines(slines, [%r{gdc -c -o build/o/_shared/main.d.o -MMD -MF build/o/_shared/main.d.o.mf -fPIC main.d}])
+    verify_lines(slines, [%r{gdc -c -o build/o/_shared/mod.d.o -MMD -MF build/o/_shared/mod.d.o.mf -fPIC mod.d}])
+
+    fcontents = File.read("mod.d", mode: "rb").sub("42", "33")
+    File.open("mod.d", "wb") {|fh| fh.write(fcontents)}
+    result = run_rscons(args: %w[-f shared_library_depgen.rb])
+    expect_eq(result.stderr, "")
+    slines = lines(result.stdout)
+    verify_lines(slines, [%r{gdc -c -o build/o/_shared/main.d.o}])
+    verify_lines(slines, [%r{gdc -c -o build/o/_shared/mod.d.o}])
+  end
+
+  test "rebuilds D shared library objects with ldc2 when dependencies change" do
+    test_dir("d")
+
+    result = run_rscons(args: %w[-f shared_library_depgen_ldc2.rb])
+    expect_eq(result.stderr, "")
+    slines = lines(result.stdout)
+    verify_lines(slines, [%r{ldc2 -c -of build/o/_shared/main.d.o(bj)? -deps=build/o/_shared/main.d.o(bj)?.mf --relocation-model=pic main.d}])
+    verify_lines(slines, [%r{ldc2 -c -of build/o/_shared/mod.d.o(bj)? -deps=build/o/_shared/mod.d.o(bj)?.mf --relocation-model=pic mod.d}])
+
+    fcontents = File.read("mod.d", mode: "rb").sub("42", "33")
+    File.open("mod.d", "wb") {|fh| fh.write(fcontents)}
+    result = run_rscons(args: %w[-f shared_library_depgen_ldc2.rb])
+    expect_eq(result.stderr, "")
+    slines = lines(result.stdout)
+    verify_lines(slines, [%r{ldc2 -c -of build/o/_shared/main.d.o}])
+    verify_lines(slines, [%r{ldc2 -c -of build/o/_shared/mod.d.o}])
   end
 end
 
