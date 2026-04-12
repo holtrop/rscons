@@ -888,6 +888,21 @@ unless RUBY_PLATFORM =~ /mingw|msys|darwin/
     verify_lines(slines, [%r{my-d-compiler -c -o build/o/_shared/src/lib/one.d.o}])
     verify_lines(slines, [%r{my-d-compiler -c -o build/o/_shared/src/lib/two.d.o}])
   end
+
+  test "creates shared libraries using D with ldc2" do
+    test_dir("shared_library")
+
+    result = run_rscons(args: %w[-f shared_library_d_ldc2.rb])
+    expect_eq(result.stderr, "")
+    slines = lines(result.stdout)
+    verify_lines(slines, [%r{ldc2 -c -of build/o/_shared/src/lib/one.d.o(bj)? --relocation-model=pic src/lib/one.d}])
+    verify_lines(slines, [%r{ldc2 -c -of build/o/_shared/src/lib/two.d.o(bj)? --relocation-model=pic src/lib/two.d}])
+    if RUBY_PLATFORM =~ /mingw|msys/
+      verify_lines(slines, [%r{Linking mine.dll}])
+    else
+      verify_lines(slines, [%r{ldc2 -of libmine.so}])
+    end
+  end
 end
 
 test "supports disassembling object files" do

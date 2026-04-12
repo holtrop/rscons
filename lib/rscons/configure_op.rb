@@ -530,11 +530,16 @@ module Rscons
           merge = {
             "DC" => dc,
             "DC:-o" => "-of",
+            "SHDC:-o" => "-of",
             "LD:-o" => "-of",
+            "SHLD:-o" => "-of",
             "LIBDIRPREFIX" => "-L-L",
             "LIBLINKPREFIX" => "-L-l",
             "DDEPGEN" => ["-deps=${_DEPFILE}"],
           }
+          unless RUBY_PLATFORM =~ /mingw|msys|cygwin/
+            merge["SHDPICFLAGS"] = ["--relocation-model=pic"]
+          end
           merge["OBJSUFFIX"] = [ldc_objsuffix]
         end
         _, _, status = log_and_test_command(command)

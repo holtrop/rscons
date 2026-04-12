@@ -3,6 +3,7 @@
 ### Fixes
 
 - Use configured D compiler for D shared library source compilation
+- Fix shared library builds using ldc2
 
 ## v3.4.1
 
