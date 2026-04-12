@@ -338,7 +338,7 @@ task "build", params: [
 ] do |task, params|
   env do |env|
     env["CPPDEFINES"] << "SOMEMACRO=#{params["myparam"]}"
-    if params["flag"]
+    if params["xyz"]
       env["CPPDEFINES"] << "ENABLE_FEATURE_XYZ"
     end
   end
@@ -580,7 +580,7 @@ supported language:
 configure do
   check_c_compiler "gcc", "clang"
   check_cxx_compiler "g++", "clang++"
-  check_d_compiler "gdc", "ldc2"
+  check_d_compiler "gdc", "ldc2", "ldc"
 end
 ```
 
@@ -1477,7 +1477,7 @@ Example use:
 default do
   download "https://ftp.gnu.org/gnu/gcc/gcc-#{gcc_version}/gcc-#{gcc_version}.tar.xz",
     "#{build_dir}/gcc-#{gcc_version}.tar.xz",
-    sha256_sum: gcc_checksum
+    sha256sum: gcc_checksum
 end
 ```
 
@@ -1959,14 +1959,13 @@ end
 ```ruby
 class GenerateFoo < Builder
   def run(options)
-    target, cache = options.values_at(:target, :cache)
-    cache.mkdir_p(File.dirname(target))
-    File.open(target, "w") do |fh|
+    @cache.mkdir_p(File.dirname(@target))
+    File.open(@target, "w") do |fh|
       fh.puts <<EOF
 #define GENERATED 42
 EOF
     end
-    target
+    true
   end
 end
 
@@ -1984,7 +1983,7 @@ env do |env|
   env["CFLAGS"] = ["-O3", "-Wall"]
   env.add_build_hook do |builder|
     if builder.sources.first =~ %r{src/third-party/}
-      build_op[:vars]["CFLAGS"] -= ["-Wall"]
+      builder.vars["CFLAGS"] -= ["-Wall"]
     end
   end
   env.Program("program", glob("**/*.cc"))

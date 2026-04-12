@@ -5,6 +5,7 @@
 - Use configured D compiler for D shared library source compilation
 - Fix shared library builds using ldc2
 - Fix dependency generation for shared libraries built with D sources
+- Fix some user guide examples
 
 ## v3.4.1
 
