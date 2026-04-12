@@ -877,6 +877,17 @@ unless RUBY_PLATFORM =~ /mingw|msys|darwin/
       verify_lines(slines, [%r{Linking libmine.so}])
     end
   end
+
+  test "uses the configured D compiler for shared library sources" do
+    test_dir("shared_library")
+    create_exe "my-d-compiler", %[exec gdc "$@"]
+
+    result = run_rscons(args: %w[-f shared_library_d_custom_dc.rb])
+    expect_eq(result.stderr, "")
+    slines = lines(result.stdout)
+    verify_lines(slines, [%r{my-d-compiler -c -o build/o/_shared/src/lib/one.d.o}])
+    verify_lines(slines, [%r{my-d-compiler -c -o build/o/_shared/src/lib/two.d.o}])
+  end
 end
 
 test "supports disassembling object files" do

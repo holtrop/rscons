@@ -1,3 +1,9 @@
+## v3.4.2
+
+### Fixes
+
+- Use configured D compiler for D shared library source compilation
+
 ## v3.4.1
 
 ### Fixes
