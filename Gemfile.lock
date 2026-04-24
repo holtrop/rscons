@@ -5,13 +5,13 @@ GEM
     date (3.5.1)
     diff-lcs (1.6.2)
     docile (1.4.1)
-    erb (6.0.2)
-    json (2.19.2)
+    erb (6.0.4)
+    json (2.19.4)
     openssl (4.0.1)
     psych (5.3.1)
       date
       stringio
-    rake (13.3.1)
+    rake (13.4.2)
     rdoc (7.2.0)
       erb
       psych (>= 4.0.0)
@@ -39,7 +39,7 @@ GEM
     stringio (3.2.0)
     syntax (1.2.2)
     tsort (0.2.0)
-    yard (0.9.38)
+    yard (0.9.43)
 
 PLATFORMS
   ruby
@@ -58,4 +58,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   2.6.9
+  4.0.8
