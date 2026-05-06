@@ -14,6 +14,7 @@ require "stringio"
 CLEAN.include %w[build_test_run .yardoc yard coverage test_run]
 CLOBBER.include %w[dist gen large_project pkg]
 
+desc "Build distribution binary"
 task :build_dist do
   sh "ruby rb/build_dist.rb"
 end
@@ -59,6 +60,7 @@ task :dspec, [:example_string] => :build_dist do |task, args|
   FileUtils.rm_f(Dir.glob(".rscons-*"))
 end
 
+desc "Generate a large project for testing"
 task :gen_large_project, [:size] => :build_dist do |task, args|
   size = (args.size || 10000).to_i
   FileUtils.rm_rf("large_project")
@@ -120,6 +122,7 @@ end
 
 task :default => :spec
 
+desc "Run all tests, build distribution binary, yard docs, and user guide"
 task :all => [
   :build_dist,
   :spec,
