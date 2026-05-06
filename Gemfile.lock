@@ -6,7 +6,7 @@ GEM
     diff-lcs (1.6.2)
     docile (1.4.1)
     erb (6.0.4)
-    json (2.19.4)
+    json (2.19.5)
     openssl (4.0.1)
     psych (5.3.1)
       date
@@ -58,4 +58,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-  4.0.8
+  4.0.11
