@@ -97,10 +97,8 @@ task :gen_large_project, [:size] => :build_dist do |task, args|
   end
   File.open("large_project/Rsconscript", "w") do |fh|
     fh.puts <<EOF
-default do
-  Environment.new do |env|
-    env.Program("project", glob("src/*.c"))
-  end
+env do |env|
+  env.Program("project", glob("src/*.c"))
 end
 EOF
   end
